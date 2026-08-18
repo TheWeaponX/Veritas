@@ -5,7 +5,7 @@ export async function createReview(
   articleId: string,
   reviewerId: string,
   status: Review['status'],
-  comment?: string
+  comment?: string | null
 ) {
   const { data, error } = await supabase
     .from('reviews')
