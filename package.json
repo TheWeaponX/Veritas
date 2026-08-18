@@ -1,0 +1,37 @@
+{
+  "name": "enciclopedia-cientifica",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
+    "@tiptap/react": "^2.6.6",
+    "@tiptap/starter-kit": "^2.6.6",
+    "@tiptap/extension-image": "^2.6.6",
+    "@tiptap/extension-link": "^2.6.6",
+    "@tiptap/extension-table": "^2.6.6",
+    "@tiptap/extension-table-row": "^2.6.6",
+    "@tiptap/extension-table-cell": "^2.6.6",
+    "@tiptap/extension-table-header": "^2.6.6",
+    "lucide-react": "^0.446.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.9",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
+  }
+}

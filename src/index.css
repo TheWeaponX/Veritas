@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  ::selection {
+    background-color: theme('colors.brass.400');
+    color: theme('colors.ink.950');
+  }
+  :focus-visible {
+    outline: 2px solid theme('colors.brass.500');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Etiqueta de taxonomia estilo "ficha de espécime" — o elemento-assinatura
+     da identidade visual: cada artigo mostra Tema › Subtema como se fosse
+     uma etiqueta de catálogo de biblioteca. */
+  .specimen-tag {
+    @apply inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-ink-500 border border-ink-100 rounded-sm px-2 py-1 bg-paper-50;
+  }
+
+  .input {
+    @apply border border-ink-100 rounded-sm px-3 py-2 text-sm bg-paper-50 focus:border-brass-500 outline-none;
+  }
+}
