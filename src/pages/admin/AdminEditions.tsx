@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Star, X, Send } from 'lucide-react';
+import { Star, X, Send, GripVertical } from 'lucide-react';
 import {
   listDraftEditions,
   createEdition,
@@ -8,6 +8,7 @@ import {
   removeArticleFromEdition,
   setCoverArticle,
   closeAndPublishEdition,
+  reorderArticlesInEdition,
 } from '../../services/editions';
 import { supabase } from '../../lib/supabase';
 import type { Edition } from '../../types/database.types';
@@ -30,7 +31,7 @@ export default function AdminEditions() {
 
     const map: Record<string, any[]> = {};
     for (const ed of d) {
-      const { data } = await supabase.from('articles').select('*, users:author_id(name)').eq('edition_id', ed.id);
+      const { data } = await supabase.from('articles').select('*, users:author_id(name)').eq('edition_id', ed.id).order('position');
       map[ed.id] = data ?? [];
     }
     setAssignedByEdition(map);
@@ -75,6 +76,34 @@ export default function AdminEditions() {
     if (!window.confirm('Fechar e publicar esta edição? Todos os artigos atribuídos a ela vão ao ar imediatamente, de uma vez.')) return;
     await closeAndPublishEdition(editionId);
     await reload();
+  }
+
+  // ---------- Arrastar e soltar pra reordenar ----------
+  const [dragEditionId, setDragEditionId] = useState<string | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+
+  function handleDragStart(editionId: string, index: number) {
+    setDragEditionId(editionId);
+    setDragIndex(index);
+  }
+
+  function handleDragOver(e: React.DragEvent, editionId: string, overIndex: number) {
+    e.preventDefault();
+    if (dragEditionId !== editionId || dragIndex === null || dragIndex === overIndex) return;
+    setAssignedByEdition((prev) => {
+      const list = [...(prev[editionId] ?? [])];
+      const [moved] = list.splice(dragIndex, 1);
+      list.splice(overIndex, 0, moved);
+      return { ...prev, [editionId]: list };
+    });
+    setDragIndex(overIndex);
+  }
+
+  async function handleDragEnd(editionId: string) {
+    setDragEditionId(null);
+    setDragIndex(null);
+    const orderedIds = (assignedByEdition[editionId] ?? []).map((a) => a.id);
+    await reorderArticlesInEdition(orderedIds);
   }
 
   if (loading) return <p className="text-sm text-ink-500">Carregando...</p>;
@@ -152,16 +181,24 @@ export default function AdminEditions() {
                   </button>
                 </div>
                 <p className="text-xs text-ink-500 mt-1">
-                  Data prevista: {ed.publish_date && new Date(ed.publish_date).toLocaleDateString('pt-BR')}
+                  Data prevista: {ed.publish_date && new Date(ed.publish_date).toLocaleDateString('pt-BR')} · arraste os artigos abaixo pra reordenar
                 </p>
 
                 <div className="mt-3 flex flex-col gap-2">
                   {(assignedByEdition[ed.id] ?? []).length === 0 ? (
                     <p className="text-xs text-ink-500">Nenhum artigo atribuído ainda.</p>
                   ) : (
-                    assignedByEdition[ed.id].map((a) => (
-                      <div key={a.id} className="flex items-center justify-between text-sm border border-ink-100 rounded-sm px-3 py-1.5 bg-white">
+                    assignedByEdition[ed.id].map((a, index) => (
+                      <div
+                        key={a.id}
+                        draggable
+                        onDragStart={() => handleDragStart(ed.id, index)}
+                        onDragOver={(e) => handleDragOver(e, ed.id, index)}
+                        onDragEnd={() => handleDragEnd(ed.id)}
+                        className="flex items-center justify-between text-sm border border-ink-100 rounded-sm px-3 py-1.5 bg-white cursor-grab active:cursor-grabbing"
+                      >
                         <span className="flex items-center gap-1.5">
+                          <GripVertical size={14} className="text-ink-300 shrink-0" />
                           {ed.cover_article_id === a.id && <Star size={13} className="text-brass-500 fill-brass-500" />}
                           {a.title} <span className="text-ink-500">— {a.users?.name}</span>
                         </span>

@@ -67,6 +67,7 @@ export interface Article {
   theme_id: string | null;
   subtheme_id: string | null;
   edition_id: string | null;
+  position: number;
   featured_image: string | null;
   is_demo: boolean;
   views: number;

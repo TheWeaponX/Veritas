@@ -39,7 +39,7 @@ export async function listArticlesInEdition(editionId: string) {
     .select('*, themes:theme_id(name), users:author_id(name)')
     .eq('edition_id', editionId)
     .eq('status', 'published')
-    .order('title');
+    .order('position');
   if (error) throw error;
   return data ?? [];
 }
@@ -81,8 +81,16 @@ export async function listApprovedUnassignedArticles() {
 }
 
 export async function assignArticleToEdition(articleId: string, editionId: string) {
-  const { error } = await supabase.from('articles').update({ edition_id: editionId }).eq('id', articleId);
+  const { data: existing } = await supabase.from('articles').select('position').eq('edition_id', editionId).order('position', { ascending: false }).limit(1);
+  const nextPosition = ((existing?.[0]?.position as number | undefined) ?? -1) + 1;
+  const { error } = await supabase.from('articles').update({ edition_id: editionId, position: nextPosition }).eq('id', articleId);
   if (error) throw error;
+}
+
+export async function reorderArticlesInEdition(orderedArticleIds: string[]) {
+  await Promise.all(
+    orderedArticleIds.map((id, index) => supabase.from('articles').update({ position: index }).eq('id', id))
+  );
 }
 
 export async function removeArticleFromEdition(articleId: string) {
