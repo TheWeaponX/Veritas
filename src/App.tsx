@@ -14,6 +14,9 @@ import AuthorsList from './pages/AuthorsList';
 import AuthorPage from './pages/AuthorPage';
 import EditionsArchive from './pages/EditionsArchive';
 import EditionPage from './pages/EditionPage';
+import About from './pages/About';
+import EditorialPolicy from './pages/EditorialPolicy';
+import AuthorGuidelines from './pages/AuthorGuidelines';
 
 import DashboardHome from './pages/dashboard/DashboardHome';
 import ArticleEditor from './pages/dashboard/ArticleEditor';
@@ -40,6 +43,9 @@ export default function App() {
         <Route path="/autores/:slug" element={<AuthorPage />} />
         <Route path="/edicoes" element={<EditionsArchive />} />
         <Route path="/edicoes/:number" element={<EditionPage />} />
+        <Route path="/sobre" element={<About />} />
+        <Route path="/politica-editorial" element={<EditorialPolicy />} />
+        <Route path="/diretrizes-autores" element={<AuthorGuidelines />} />
       </Route>
 
       <Route
