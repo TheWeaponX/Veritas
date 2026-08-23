@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Menu, X } from 'lucide-react';
+import { Search, Menu, X, Shield } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { signOut } from '../../services/auth';
 
 export default function Header() {
-  const { profile, isAuthenticated } = useAuth();
+  const { profile, isAuthenticated, isEditor } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -27,6 +27,14 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
             <>
+              {isEditor && (
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-1.5 text-sm text-brass-400 hover:text-brass-300 transition-colors"
+                >
+                  <Shield size={14} /> Painel admin
+                </Link>
+              )}
               <Link
                 to="/dashboard"
                 className="text-sm text-ink-100 hover:text-brass-400 transition-colors"
@@ -70,6 +78,11 @@ export default function Header() {
           <Link to="/pesquisa" onClick={() => setMenuOpen(false)}>Pesquisar</Link>
           {isAuthenticated ? (
             <>
+              {isEditor && (
+                <Link to="/admin" onClick={() => setMenuOpen(false)} className="text-brass-400">
+                  Painel admin
+                </Link>
+              )}
               <Link to="/dashboard" onClick={() => setMenuOpen(false)}>Meu painel</Link>
               <button
                 className="text-left"
