@@ -24,6 +24,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminThemesTags from './pages/admin/AdminThemesTags';
 import AdminEditions from './pages/admin/AdminEditions';
+import AdminRejected from './pages/admin/AdminRejected';
 
 export default function App() {
   return (
@@ -68,6 +69,14 @@ export default function App() {
           element={
             <RequireAdmin>
               <AdminEditions />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/admin/rejeitados"
+          element={
+            <RequireAdmin>
+              <AdminRejected />
             </RequireAdmin>
           }
         />

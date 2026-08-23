@@ -94,6 +94,21 @@ export async function requestChangesOnArticle(articleId: string) {
   return saveArticle(articleId, { status: 'changes_requested' });
 }
 
+export async function listRejectedArticles() {
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*, users:author_id(name), themes:theme_id(name)')
+    .eq('status', 'rejected')
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function deleteArticlePermanently(articleId: string) {
+  const { error } = await supabase.from('articles').delete().eq('id', articleId);
+  if (error) throw error;
+}
+
 export async function searchArticles(query: string) {
   // Busca por título/resumo, e também por tema ou palavra-chave — mas tema
   // e tag nunca aparecem como filtro visível na UI, só influenciam quais
