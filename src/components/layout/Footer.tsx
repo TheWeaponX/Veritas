@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-ink-950 text-ink-100 mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         <div className="col-span-2 md:col-span-1">
-          <p className="font-display text-lg text-paper-50 mb-2">Encyclios</p>
+          <p className="font-display text-lg text-paper-50 mb-2">Scientia Periodica</p>
           <p className="text-sm text-ink-300">Conhecimento científico, organizado para todos.</p>
         </div>
         <div className="flex flex-col gap-2 text-sm">
@@ -22,7 +22,7 @@ export default function Footer() {
         </div>
         <div className="flex flex-col gap-2 text-sm">
           <span className="text-ink-500 font-mono text-xs uppercase tracking-wider mb-1">Contato</span>
-          <a href="mailto:contato@encyclios.com" className="hover:text-brass-400">contato@encyclios.com</a>
+          <a href="mailto:contato@scientiaperiodica.com" className="hover:text-brass-400">contato@scientiaperiodica.com</a>
         </div>
       </div>
     </footer>
