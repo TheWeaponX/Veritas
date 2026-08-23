@@ -1,4 +1,4 @@
-# Encyclios — Enciclopédia Científica Digital
+# Scientia Periodica — Enciclopédia Científica Digital
 
 Fundação do projeto: schema de banco, autenticação e páginas públicas (home,
 tema, artigo, pesquisa, login/cadastro) já funcionais e ligadas ao Supabase.
