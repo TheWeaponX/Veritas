@@ -2,18 +2,18 @@ export default function About() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
       <span className="specimen-tag">Sobre</span>
-      <h1 className="font-display text-3xl font-semibold mt-4 mb-6">Sobre a Encyclios</h1>
+      <h1 className="font-display text-3xl font-semibold mt-4 mb-6">Sobre a Scientia Periodica</h1>
 
       <div className="flex flex-col gap-5 text-ink-700 leading-relaxed">
         <p>
-          A Encyclios é um periódico científico semanal escrito por jovens estudantes e cientistas em
+          A Scientia Periodica é um periódico científico semanal escrito por jovens estudantes e cientistas em
           formação. A cada edição, reunimos artigos sobre astronomia, biologia, física, química,
           matemática, tecnologia e outras áreas da ciência — escritos por quem está aprendendo a pensar
           cientificamente, para quem também quer aprender.
         </p>
         <p>
           Acreditamos que escrever sobre ciência é uma das melhores formas de aprender ciência. Por
-          isso, a Encyclios funciona como uma redação de verdade: autores enviam seus textos, uma equipe
+          isso, a Scientia Periodica funciona como uma redação de verdade: autores enviam seus textos, uma equipe
           editorial revisa, sugere correções quando necessário, e os textos aprovados entram na próxima
           edição semanal.
         </p>

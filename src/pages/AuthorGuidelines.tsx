@@ -2,7 +2,7 @@ export default function AuthorGuidelines() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
       <span className="specimen-tag">Diretrizes para autores</span>
-      <h1 className="font-display text-3xl font-semibold mt-4 mb-6">Como publicar na Encyclios</h1>
+      <h1 className="font-display text-3xl font-semibold mt-4 mb-6">Como publicar na Scientia Periodica</h1>
 
       <div className="flex flex-col gap-6 text-ink-700 leading-relaxed">
         <section>
@@ -29,7 +29,7 @@ export default function AuthorGuidelines() {
         <section>
           <h2 className="font-display text-lg font-semibold text-ink-900 mb-2">3. Escreva para quem está aprendendo</h2>
           <p>
-            O leitor da Encyclios não é um especialista. Evite jargão sem explicação, prefira frases
+            O leitor da Scientia Periodica não é um especialista. Evite jargão sem explicação, prefira frases
             diretas e use exemplos do dia a dia sempre que ajudar a entender um conceito.
           </p>
         </section>

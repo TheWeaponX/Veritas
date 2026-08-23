@@ -14,7 +14,7 @@ export default function AuthorsList() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
       <h1 className="font-display text-3xl font-semibold mb-1">Autores</h1>
-      <p className="text-ink-500 mb-10">Conheça quem escreve e revisa o conteúdo da Encyclios.</p>
+      <p className="text-ink-500 mb-10">Conheça quem escreve e revisa o conteúdo da Scientia Periodica.</p>
 
       {loading ? (
         <p className="text-sm text-ink-500">Carregando...</p>

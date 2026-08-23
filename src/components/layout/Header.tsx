@@ -13,7 +13,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-ink-900 text-paper-50 border-b border-ink-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-6">
         <Link to="/" className="font-display text-xl font-semibold tracking-tight shrink-0">
-          Encyclios
+          Scientia Periodica
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 font-body text-sm text-ink-100">
