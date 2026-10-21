@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,10 +8,16 @@
   html {
     scroll-behavior: smooth;
   }
+  
+  body {
+    @apply bg-paper-100 text-ink-900 font-body;
+  }
+
   ::selection {
     background-color: theme('colors.brass.400');
     color: theme('colors.ink.950');
   }
+  
   :focus-visible {
     outline: 2px solid theme('colors.brass.500');
     outline-offset: 2px;
