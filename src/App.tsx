@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import SearchPage from './pages/SearchPage';
 import ThemePage from './pages/ThemePage';
+import ThemesPage from './pages/ThemesPage'; // <-- Importação corrigida para o topo
 import ArticlePage from './pages/ArticlePage';
 import AuthorsList from './pages/AuthorsList';
 import AuthorPage from './pages/AuthorPage';
@@ -37,6 +38,10 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Register />} />
         <Route path="/pesquisa" element={<SearchPage />} />
+        
+        {/* Rota pública adicionada no lugar certo */}
+        <Route path="/temas" element={<ThemesPage />} />
+        
         <Route path="/temas/:slug" element={<ThemePage />} />
         <Route path="/artigos/:slug" element={<ArticlePage />} />
         <Route path="/autores" element={<AuthorsList />} />
@@ -94,11 +99,6 @@ export default function App() {
             </RequireAdmin>
           }
         />
-        // Adicione junto das outras importações no topo
-import ThemesPage from './pages/ThemesPage';
-
-// Adicione dentro do bloco <Routes>
-<Route path="/temas" element={<ThemesPage />} />
       </Route>
     </Routes>
   );
