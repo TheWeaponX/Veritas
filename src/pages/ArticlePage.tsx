@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getArticleBySlug } from '../services/articles';
 import ArticleBody from '../components/article/ArticleBody';
+import StudentFeatures from '../components/article/StudentFeatures';
 
 export default function ArticlePage() {
   const { slug } = useParams();
@@ -57,6 +58,16 @@ export default function ArticlePage() {
 
       <div className="mt-8 text-ink-800 leading-relaxed">
         <ArticleBody content={article.content} />
+      </div>
+
+      {/* NOVO: Componente de funcionalidades para estudantes adicionado aqui */}
+      <div className="mt-12 mb-8">
+        <StudentFeatures 
+          articleTitle={article.title}
+          authorName={article.users?.name || 'Autor'}
+          publishYear={article.published_at ? new Date(article.published_at).getFullYear() : new Date().getFullYear()}
+          articleId={article.id}
+        />
       </div>
 
       {article.references?.length > 0 && (
