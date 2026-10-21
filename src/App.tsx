@@ -94,6 +94,11 @@ export default function App() {
             </RequireAdmin>
           }
         />
+        // Adicione junto das outras importações no topo
+import ThemesPage from './pages/ThemesPage';
+
+// Adicione dentro do bloco <Routes>
+<Route path="/temas" element={<ThemesPage />} />
       </Route>
     </Routes>
   );
