@@ -4,6 +4,7 @@ import { CheckCircle2, XCircle, MessageSquareWarning } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { listSubmittedArticles, approveArticle, rejectArticle, requestChangesOnArticle } from '../../services/articles';
 import { createReview } from '../../services/reviews';
+import { sendNotificationEmail } from '../../services/email';
 import ArticleBody from '../../components/article/ArticleBody';
 
 export default function AdminReviews() {
@@ -30,6 +31,18 @@ export default function AdminReviews() {
     try {
       await approveArticle(articleId);
       await createReview(articleId, profile.id, 'approved', 'Aprovado. Aguardando entrar em uma edição.');
+      
+      // DISPARO DE E-MAIL
+      const article = articles.find((a) => a.id === articleId);
+      if (article && article.users?.email) {
+        await sendNotificationEmail(
+          article.users.email,
+          article.users.name || 'Autor',
+          article.title,
+          'O seu artigo foi aprovado e encontra-se na fila para publicação na próxima edição!'
+        );
+      }
+
       await reload();
     } finally {
       setBusyId(null);
@@ -43,6 +56,18 @@ export default function AdminReviews() {
     try {
       await rejectArticle(articleId);
       await createReview(articleId, profile.id, 'rejected', commentDraft || null);
+      
+      // DISPARO DE E-MAIL
+      const article = articles.find((a) => a.id === articleId);
+      if (article && article.users?.email) {
+        await sendNotificationEmail(
+          article.users.email,
+          article.users.name || 'Autor',
+          article.title,
+          `O seu artigo foi infelizmente rejeitado. Observação do revisor: ${commentDraft || 'Sem observações adicionais.'}`
+        );
+      }
+
       setCommentDraft('');
       setOpenId(null);
       await reload();
@@ -61,6 +86,18 @@ export default function AdminReviews() {
     try {
       await requestChangesOnArticle(articleId);
       await createReview(articleId, profile.id, 'changes_requested', commentDraft);
+      
+      // DISPARO DE E-MAIL
+      const article = articles.find((a) => a.id === articleId);
+      if (article && article.users?.email) {
+        await sendNotificationEmail(
+          article.users.email,
+          article.users.name || 'Autor',
+          article.title,
+          `Foram solicitadas alterações no seu artigo. Observação do revisor: ${commentDraft}`
+        );
+      }
+
       setCommentDraft('');
       setOpenId(null);
       await reload();
