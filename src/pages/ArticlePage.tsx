@@ -58,3 +58,52 @@ export default function ArticlePage() {
         </div>
         <div className="text-xs text-gray-500 italic">
           Documento gerado em {new Date().toLocaleDateString('pt-BR')} — Disponível em: {window.location.href}
+        </div>
+      </div>
+
+      {/* Metadados visíveis na Web */}
+      <div className="mb-8 print:hidden">
+        <div className="flex items-center gap-2 mb-3">
+          {article.themes?.name && <span className="specimen-tag">{article.themes.name}</span>}
+          {article.editions?.number && <span className="text-xs text-ink-500">Edição #{article.editions.number}</span>}
+        </div>
+        <h1 className="font-display text-3xl sm:text-5xl font-bold text-ink-900 leading-tight mb-4">
+          {article.title}
+        </h1>
+        {article.summary && (
+          <p className="text-lg text-ink-700 leading-relaxed font-serif italic mb-6">
+            {article.summary}
+          </p>
+        )}
+        {article.users?.name && (
+          <p className="text-sm font-medium text-ink-600">
+            Por <span className="text-ink-900 font-semibold">{article.users.name}</span>
+          </p>
+        )}
+      </div>
+
+      {/* Título formatado apenas para a versão impressa / PDF */}
+      <div className="hidden print:block mb-6">
+        <h1 className="text-2xl font-bold mb-2">{article.title}</h1>
+        <p className="text-sm italic mb-2">Autor: {article.users?.name || 'Autor Desconhecido'}</p>
+        {article.summary && <p className="text-xs font-serif italic border-l-2 border-black pl-3 py-1 my-3">{article.summary}</p>}
+      </div>
+
+      {/* Caixa de Ferramentas de Estudo (Oculta na impressão) */}
+      <div className="mb-10 print:hidden">
+        <StudentFeatures 
+          articleTitle={article.title}
+          authorName={article.users?.name || 'Autor Desconhecido'}
+          publishYear={publishYear}
+          articleId={article.id}
+        />
+      </div>
+
+      {/* Conteúdo do Artigo */}
+      <div className="prose prose-lg max-w-none text-ink-900 font-serif leading-relaxed">
+        <div dangerouslySetInnerHTML={{ __html: article.content }} />
+      </div>
+
+    </article>
+  );
+}
