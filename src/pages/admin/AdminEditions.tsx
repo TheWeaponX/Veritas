@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Star, X, Send, GripVertical } from 'lucide-react';
+import { Star, X, Send, GripVertical, Image as ImageIcon, Loader2 } from 'lucide-react';
 import {
   listDraftEditions,
   createEdition,
@@ -23,6 +23,7 @@ export default function AdminEditions() {
   const [newDate, setNewDate] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [creating, setCreating] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState<string | null>(null);
 
   async function reload() {
     const [d, u] = await Promise.all([listDraftEditions(), listApprovedUnassignedArticles()]);
@@ -76,6 +77,43 @@ export default function AdminEditions() {
     if (!window.confirm('Fechar e publicar esta edição? Todos os artigos atribuídos a ela vão ao ar imediatamente, de uma vez.')) return;
     await closeAndPublishEdition(editionId);
     await reload();
+  }
+
+  // ---------- Upload de Capa ----------
+  async function handleUploadCover(editionId: string, file: File) {
+    if (!file) return;
+    setUploadingCover(editionId);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${editionId}-${Date.now()}.${fileExt}`;
+
+      // 1. Faz upload para o bucket
+      const { error: uploadError } = await supabase.storage
+        .from('covers')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // 2. Obtém a URL pública
+      const { data: { publicUrl } } = supabase.storage
+        .from('covers')
+        .getPublicUrl(fileName);
+
+      // 3. Atualiza a tabela editions
+      const { error: updateError } = await supabase
+        .from('editions')
+        .update({ cover_url: publicUrl })
+        .eq('id', editionId);
+
+      if (updateError) throw updateError;
+
+      await reload();
+    } catch (error) {
+      console.error("Erro no upload da capa:", error);
+      alert("Erro ao enviar a imagem. Verifique se o bucket 'covers' é público.");
+    } finally {
+      setUploadingCover(null);
+    }
   }
 
   // ---------- Arrastar e soltar pra reordenar ----------
@@ -168,10 +206,48 @@ export default function AdminEditions() {
           <div className="flex flex-col gap-4">
             {drafts.map((ed) => (
               <div key={ed.id} className="border border-ink-100 rounded-sm bg-paper-50 p-4">
-                <div className="flex items-center justify-between">
-                  <p className="font-display text-lg font-medium">
-                    Edição #{ed.number}{ed.title && ` — ${ed.title}`}
-                  </p>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex gap-4 items-center">
+                    {/* Exibição da Capa */}
+                    {ed.cover_url ? (
+                      <img src={ed.cover_url} alt="Capa da edição" className="w-16 h-20 object-cover rounded-sm border border-ink-200" />
+                    ) : (
+                      <div className="w-16 h-20 bg-ink-50 border border-dashed border-ink-200 rounded-sm flex items-center justify-center">
+                        <ImageIcon size={20} className="text-ink-300" />
+                      </div>
+                    )}
+                    
+                    <div>
+                      <p className="font-display text-lg font-medium">
+                        Edição #{ed.number}{ed.title && ` — ${ed.title}`}
+                      </p>
+                      <p className="text-xs text-ink-500 mt-1">
+                        Data prevista: {ed.publish_date && new Date(ed.publish_date).toLocaleDateString('pt-BR')}
+                      </p>
+                      
+                      {/* Botão de Upload */}
+                      <div className="mt-2">
+                        <label className="cursor-pointer inline-flex items-center gap-1 text-xs font-medium text-brass-600 hover:text-brass-700 transition-colors">
+                          {uploadingCover === ed.id ? (
+                            <><Loader2 size={12} className="animate-spin" /> Enviando...</>
+                          ) : (
+                            <>{ed.cover_url ? 'Alterar capa' : 'Adicionar capa'}</>
+                          )}
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            disabled={uploadingCover === ed.id}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleUploadCover(ed.id, file);
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                   <button
                     onClick={() => handleClose(ed.id)}
                     disabled={(assignedByEdition[ed.id]?.length ?? 0) === 0}
@@ -180,13 +256,11 @@ export default function AdminEditions() {
                     <Send size={14} /> Fechar e publicar
                   </button>
                 </div>
-                <p className="text-xs text-ink-500 mt-1">
-                  Data prevista: {ed.publish_date && new Date(ed.publish_date).toLocaleDateString('pt-BR')} · arraste os artigos abaixo pra reordenar
-                </p>
 
-                <div className="mt-3 flex flex-col gap-2">
+                <div className="border-t border-ink-100 pt-3 flex flex-col gap-2">
+                  <p className="text-xs text-ink-500 mb-1">Arraste os artigos abaixo para reordenar:</p>
                   {(assignedByEdition[ed.id] ?? []).length === 0 ? (
-                    <p className="text-xs text-ink-500">Nenhum artigo atribuído ainda.</p>
+                    <p className="text-xs text-ink-500 italic">Nenhum artigo atribuído ainda.</p>
                   ) : (
                     assignedByEdition[ed.id].map((a, index) => (
                       <div
@@ -198,27 +272,3 @@ export default function AdminEditions() {
                         className="flex items-center justify-between text-sm border border-ink-100 rounded-sm px-3 py-1.5 bg-white cursor-grab active:cursor-grabbing"
                       >
                         <span className="flex items-center gap-1.5">
-                          <GripVertical size={14} className="text-ink-300 shrink-0" />
-                          {ed.cover_article_id === a.id && <Star size={13} className="text-brass-500 fill-brass-500" />}
-                          {a.title} <span className="text-ink-500">— {a.users?.name}</span>
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => handleSetCover(ed.id, a.id)} className="text-xs text-brass-600 hover:text-brass-500">
-                            Destacar
-                          </button>
-                          <button onClick={() => handleRemove(a.id)} className="text-ink-400 hover:text-red-600">
-                            <X size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
-  );
-}
