@@ -2,7 +2,8 @@ import { supabase } from '../lib/supabase';
 import { slugify } from '../utils/slugify';
 import type { Article, ArticleStatus } from '../types/database.types';
 
-export async function listPublishedArticles(limit = 6) {  const { data, error } = await supabase
+export async function listPublishedArticles(limit = 6) {
+  const { data, error } = await supabase
     .from('articles')
     .select('*, themes:theme_id(name, slug), users:author_id(name)')
     .eq('status', 'published')
@@ -73,7 +74,7 @@ export async function submitForReview(articleId: string) {
 export async function listSubmittedArticles() {
   const { data, error } = await supabase
     .from('articles')
-    .select('*, users:author_id(name), themes:theme_id(name)')
+    .select('*, users:author_id(name, email), themes:theme_id(name)')
     .eq('status', 'submitted')
     .order('updated_at', { ascending: true });
   if (error) throw error;
