@@ -87,19 +87,16 @@ export default function AdminEditions() {
       const fileExt = file.name.split('.').pop();
       const fileName = `${editionId}-${Date.now()}.${fileExt}`;
 
-      // 1. Faz upload para o bucket
       const { error: uploadError } = await supabase.storage
         .from('covers')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
-      // 2. Obtém a URL pública
       const { data: { publicUrl } } = supabase.storage
         .from('covers')
         .getPublicUrl(fileName);
 
-      // 3. Atualiza a tabela editions
       const { error: updateError } = await supabase
         .from('editions')
         .update({ cover_url: publicUrl })
@@ -151,7 +148,6 @@ export default function AdminEditions() {
       <h1 className="font-display text-2xl font-semibold mb-1">Edições</h1>
       <p className="text-sm text-ink-500 mb-8">Monte a próxima edição e publique tudo de uma vez.</p>
 
-      {/* CRIAR EDIÇÃO */}
       <section className="mb-10">
         <h2 className="font-display text-lg font-semibold mb-3">Nova edição</h2>
         <form onSubmit={handleCreateEdition} className="border border-dashed border-ink-100 rounded-sm p-3 grid grid-cols-2 gap-2">
@@ -164,7 +160,6 @@ export default function AdminEditions() {
         </form>
       </section>
 
-      {/* ARTIGOS APROVADOS SEM EDIÇÃO */}
       <section className="mb-10">
         <h2 className="font-display text-lg font-semibold mb-3">Aprovados aguardando edição</h2>
         {unassigned.length === 0 ? (
@@ -197,7 +192,6 @@ export default function AdminEditions() {
         )}
       </section>
 
-      {/* EDIÇÕES EM RASCUNHO */}
       <section>
         <h2 className="font-display text-lg font-semibold mb-3">Edições em montagem</h2>
         {drafts.length === 0 ? (
@@ -208,7 +202,6 @@ export default function AdminEditions() {
               <div key={ed.id} className="border border-ink-100 rounded-sm bg-paper-50 p-4">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex gap-4 items-center">
-                    {/* Exibição da Capa */}
                     {ed.cover_url ? (
                       <img src={ed.cover_url} alt="Capa da edição" className="w-16 h-20 object-cover rounded-sm border border-ink-200" />
                     ) : (
@@ -225,7 +218,6 @@ export default function AdminEditions() {
                         Data prevista: {ed.publish_date && new Date(ed.publish_date).toLocaleDateString('pt-BR')}
                       </p>
                       
-                      {/* Botão de Upload */}
                       <div className="mt-2">
                         <label className="cursor-pointer inline-flex items-center gap-1 text-xs font-medium text-brass-600 hover:text-brass-700 transition-colors">
                           {uploadingCover === ed.id ? (
@@ -272,3 +264,27 @@ export default function AdminEditions() {
                         className="flex items-center justify-between text-sm border border-ink-100 rounded-sm px-3 py-1.5 bg-white cursor-grab active:cursor-grabbing"
                       >
                         <span className="flex items-center gap-1.5">
+                          <GripVertical size={14} className="text-ink-300 shrink-0" />
+                          {ed.cover_article_id === a.id && <Star size={13} className="text-brass-500 fill-brass-500" />}
+                          {a.title} <span className="text-ink-500">— {a.users?.name}</span>
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleSetCover(ed.id, a.id)} className="text-xs text-brass-600 hover:text-brass-500">
+                            Destacar
+                          </button>
+                          <button onClick={() => handleRemove(a.id)} className="text-ink-400 hover:text-red-600">
+                            <X size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
