@@ -23,7 +23,8 @@
     "@tiptap/extension-table-row": "^2.6.6",
     "@tiptap/extension-table-cell": "^2.6.6",
     "@tiptap/extension-table-header": "^2.6.6",
-    "lucide-react": "^0.446.0"
+    "lucide-react": "^0.446.0",
+    "@react-pdf/renderer": "^3.4.4"
   },
   "devDependencies": {
     "@types/react": "^18.3.9",
