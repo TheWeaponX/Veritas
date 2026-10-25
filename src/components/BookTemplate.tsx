@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import capaFundo from './capa_padrao.jpg'; // Importação direta do JPG na mesma pasta
+import capaFundo from './capa_padrao.jpg';
 
 const styles = StyleSheet.create({
   page: {
@@ -14,56 +14,61 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     position: 'absolute',
-    minWidth: '100%',
-    minHeight: '100%',
-    display: 'block',
+    width: '100%',
+    height: '100%',
     top: 0,
     left: 0,
-    right: 0,
-    bottom: 0,
   },
-  textoSobreposto: {
+  
+  // A CAIXA INVISÍVEL: Alinhada exatamente com a moldura dourada da imagem
+  caixaDeTexto: {
     position: 'absolute',
-    top: '25%',
-    bottom: '25%',
-    left: '15%', // Margens ajustadas para dar mais espaço ao título
-    right: '15%',
-    justifyContent: 'center', 
-    alignItems: 'center',
+    top: '24%',    // Distância exata do topo até à moldura interna
+    bottom: '24%', // Distância exata da base até à moldura interna
+    left: '22%',   // Distância da lateral esquerda
+    right: '22%',  // Distância da lateral direita
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center', // Centraliza verticalmente dentro da caixa
+    alignItems: 'center',     // Centraliza horizontalmente dentro da caixa
+    padding: 10,              // Respiro extra para o texto nunca tocar na linha dourada
   },
+
   tituloCapa: {
-    fontSize: 28, // Fonte reduzida ligeiramente para a palavra não quebrar
+    fontSize: 26, 
     color: '#d4af37',
     textAlign: 'center',
     fontFamily: 'Times-Bold',
     textTransform: 'uppercase',
-    marginBottom: 15,
+    marginBottom: 20,
+    // O texto vai quebrar de linha automaticamente ao atingir o limite da caixaDeTexto
   },
   ornamento: {
-    width: 40,
+    width: 50,
     height: 1,
     backgroundColor: '#d4af37',
-    marginBottom: 15,
+    marginBottom: 20,
   },
   autorCapa: {
     fontSize: 16,
     color: '#e2c575',
     fontFamily: 'Times-Roman',
     fontStyle: 'italic',
+    textAlign: 'center',
   },
   selo: {
-    position: 'absolute',
-    bottom: -35,
+    marginTop: 40, 
     fontSize: 10,
     color: '#d4af37',
     textTransform: 'uppercase',
     letterSpacing: 2,
     opacity: 0.9,
+    textAlign: 'center',
   },
+  
+  // CONTEÚDO DO LIVRO
   pageConteudo: {
-    paddingTop: 80, // Margens com padrão de livro acadêmico
+    paddingTop: 80,
     paddingBottom: 80,
     paddingHorizontal: 75,
     fontFamily: 'Times-Roman',
@@ -77,7 +82,7 @@ const styles = StyleSheet.create({
   },
   texto: {
     fontSize: 12,
-    lineHeight: 1.6, // Maior respiro entre as linhas de texto
+    lineHeight: 1.6,
     textAlign: 'justify',
     marginBottom: 12,
   },
@@ -88,10 +93,9 @@ export const BookTemplate = ({ title, author, content }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.capaContainer}>
-          {/* O código volta a usar a variável capaFundo que importamos acima */}
           <Image src={capaFundo} style={styles.backgroundImage} />
           
-          <View style={styles.textoSobreposto}>
+          <View style={styles.caixaDeTexto}>
             <Text style={styles.tituloCapa}>{title}</Text>
             <View style={styles.ornamento} />
             <Text style={styles.autorCapa}>{author}</Text>
