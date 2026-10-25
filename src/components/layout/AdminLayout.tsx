@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, FileCheck, Users, FolderTree, Newspaper, Trash2 } from 'lucide-react';
+import { LayoutDashboard, FileCheck, Users, FolderTree, Newspaper, Trash2, BookOpen } from 'lucide-react';
 import Header from './Header';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -10,6 +10,7 @@ export default function AdminLayout() {
     { to: '/admin', label: 'Visão geral', icon: LayoutDashboard, end: true },
     { to: '/admin/revisoes', label: 'Revisão de artigos', icon: FileCheck },
     { to: '/admin/temas', label: 'Temas e tags', icon: FolderTree },
+    { to: '/admin/classicos', label: 'Clássicos (IA)', icon: BookOpen }, // <-- Botão adicionado aqui
     ...(isAdmin ? [{ to: '/admin/edicoes', label: 'Edições', icon: Newspaper, end: false }] : []),
     ...(isAdmin ? [{ to: '/admin/rejeitados', label: 'Rejeitados', icon: Trash2, end: false }] : []),
     ...(isAdmin ? [{ to: '/admin/usuarios', label: 'Usuários', icon: Users, end: false }] : []),
