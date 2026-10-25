@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import capaFundo from './capa_padrao.jpg'; // O Vite vai embutir a imagem aqui
+import { capaBase64 } from './capaBase64';
 
 const styles = StyleSheet.create({
   page: {
@@ -26,36 +26,38 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '25%',
     bottom: '25%',
-    left: '20%',
-    right: '20%',
+    // Reduzi as margens laterais de 20% para 15% para dar mais espaço ao título
+    left: '15%',
+    right: '15%',
     justifyContent: 'center', 
     alignItems: 'center',
     display: 'flex',
     flexDirection: 'column',
   },
   tituloCapa: {
-    fontSize: 32,
+    // Reduzi a fonte de 32 para 28 para evitar que palavras grandes quebrem ao meio
+    fontSize: 28,
     color: '#d4af37',
     textAlign: 'center',
     fontFamily: 'Times-Bold',
     textTransform: 'uppercase',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   ornamento: {
-    width: 30,
+    width: 40,
     height: 1,
     backgroundColor: '#d4af37',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   autorCapa: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#e2c575',
     fontFamily: 'Times-Roman',
     fontStyle: 'italic',
   },
   selo: {
     position: 'absolute',
-    bottom: -60,
+    bottom: -35, // Ajustado para ficar perfeitamente alinhado
     fontSize: 10,
     color: '#d4af37',
     textTransform: 'uppercase',
@@ -63,22 +65,24 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   pageConteudo: {
-    padding: 50,
+    // Margens significativamente maiores (80 equivale a ~2.8 cm, padrão acadêmico)
+    paddingTop: 80,
+    paddingBottom: 80,
+    paddingHorizontal: 75,
     fontFamily: 'Times-Roman',
     backgroundColor: '#ffffff',
   },
   tituloCapitulo: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: 'Times-Bold',
-    marginBottom: 20,
-    marginTop: 20,
+    marginBottom: 30,
     textAlign: 'center',
   },
   texto: {
     fontSize: 12,
-    lineHeight: 1.5,
+    lineHeight: 1.6, // Aumentei o respiro entre as linhas (antes era 1.5)
     textAlign: 'justify',
-    marginBottom: 10,
+    marginBottom: 12,
   },
 });
 
@@ -87,8 +91,7 @@ export const BookTemplate = ({ title, author, content }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.capaContainer}>
-          {/* Agora usamos a variável importada diretamente */}
-          <Image src={capaFundo} style={styles.backgroundImage} />
+          <Image src={capaBase64} style={styles.backgroundImage} />
           
           <View style={styles.textoSobreposto}>
             <Text style={styles.tituloCapa}>{title}</Text>
