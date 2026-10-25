@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import { capaBase64 } from './capaBase64';
+import capaFundo from './capa_padrao.jpg'; // Importação direta do JPG na mesma pasta
 
 const styles = StyleSheet.create({
   page: {
@@ -26,8 +26,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '25%',
     bottom: '25%',
-    // Reduzi as margens laterais de 20% para 15% para dar mais espaço ao título
-    left: '15%',
+    left: '15%', // Margens ajustadas para dar mais espaço ao título
     right: '15%',
     justifyContent: 'center', 
     alignItems: 'center',
@@ -35,8 +34,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   tituloCapa: {
-    // Reduzi a fonte de 32 para 28 para evitar que palavras grandes quebrem ao meio
-    fontSize: 28,
+    fontSize: 28, // Fonte reduzida ligeiramente para a palavra não quebrar
     color: '#d4af37',
     textAlign: 'center',
     fontFamily: 'Times-Bold',
@@ -57,7 +55,7 @@ const styles = StyleSheet.create({
   },
   selo: {
     position: 'absolute',
-    bottom: -35, // Ajustado para ficar perfeitamente alinhado
+    bottom: -35,
     fontSize: 10,
     color: '#d4af37',
     textTransform: 'uppercase',
@@ -65,8 +63,7 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   pageConteudo: {
-    // Margens significativamente maiores (80 equivale a ~2.8 cm, padrão acadêmico)
-    paddingTop: 80,
+    paddingTop: 80, // Margens com padrão de livro acadêmico
     paddingBottom: 80,
     paddingHorizontal: 75,
     fontFamily: 'Times-Roman',
@@ -80,7 +77,7 @@ const styles = StyleSheet.create({
   },
   texto: {
     fontSize: 12,
-    lineHeight: 1.6, // Aumentei o respiro entre as linhas (antes era 1.5)
+    lineHeight: 1.6, // Maior respiro entre as linhas de texto
     textAlign: 'justify',
     marginBottom: 12,
   },
@@ -91,7 +88,8 @@ export const BookTemplate = ({ title, author, content }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.capaContainer}>
-          <Image src={capaBase64} style={styles.backgroundImage} />
+          {/* O código volta a usar a variável capaFundo que importamos acima */}
+          <Image src={capaFundo} style={styles.backgroundImage} />
           
           <View style={styles.textoSobreposto}>
             <Text style={styles.tituloCapa}>{title}</Text>
