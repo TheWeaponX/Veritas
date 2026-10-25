@@ -6,6 +6,8 @@ import { listSubmittedArticles, approveArticle, rejectArticle, requestChangesOnA
 import { createReview } from '../../services/reviews';
 import { sendNotificationEmail } from '../../services/email';
 import ArticleBody from '../../components/article/ArticleBody';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { BookTemplate } from '../../components/BookTemplate';
 
 export default function AdminReviews() {
   const { profile } = useAuth();
@@ -32,7 +34,6 @@ export default function AdminReviews() {
       await approveArticle(articleId);
       await createReview(articleId, profile.id, 'approved', 'Aprovado. Aguardando entrar em uma edição.');
       
-      // DISPARO DE E-MAIL
       const article = articles.find((a) => a.id === articleId);
       if (article && article.users?.email) {
         await sendNotificationEmail(
@@ -57,7 +58,6 @@ export default function AdminReviews() {
       await rejectArticle(articleId);
       await createReview(articleId, profile.id, 'rejected', commentDraft || null);
       
-      // DISPARO DE E-MAIL
       const article = articles.find((a) => a.id === articleId);
       if (article && article.users?.email) {
         await sendNotificationEmail(
@@ -87,7 +87,6 @@ export default function AdminReviews() {
       await requestChangesOnArticle(articleId);
       await createReview(articleId, profile.id, 'changes_requested', commentDraft);
       
-      // DISPARO DE E-MAIL
       const article = articles.find((a) => a.id === articleId);
       if (article && article.users?.email) {
         await sendNotificationEmail(
@@ -109,7 +108,25 @@ export default function AdminReviews() {
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold mb-1">Revisão de artigos</h1>
-      <p className="text-sm text-ink-500 mb-8">Artigos enviados por autores, aguardando decisão.</p>
+      <p className="text-sm text-ink-500 mb-4">Artigos enviados por autores, aguardando decisão.</p>
+
+      {/* BLOCO DE TESTE DO GERADOR DE PDF */}
+      <div className="mb-8 p-4 bg-paper-50 rounded-sm border border-ink-100">
+        <p className="mb-3 text-sm font-semibold text-ink-950">Teste do Gerador Académico:</p>
+        <PDFDownloadLink
+          document={
+            <BookTemplate 
+              title="A Origem das Espécies" 
+              author="Charles Darwin" 
+              content="Esta é a edição comentada exclusiva da Scientia Periodica. O texto flui automaticamente, as margens são respeitadas e as quebras de página são geradas sozinhas! O nosso acervo de domínio público começa aqui." 
+            />
+          }
+          fileName="Scientia_Periodica_Darwin.pdf"
+          className="inline-flex items-center justify-center bg-ink-950 text-brass-400 hover:text-brass-300 px-4 py-2 rounded-sm text-sm font-medium transition"
+        >
+          {({ loading }) => (loading ? 'A diagramar livro...' : 'Descarregar PDF de Teste')}
+        </PDFDownloadLink>
+      </div>
 
       {loading ? (
         <p className="text-sm text-ink-500">Carregando...</p>
