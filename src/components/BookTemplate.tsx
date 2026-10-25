@@ -1,6 +1,9 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import capaFundo from './capa_padrao.jpg';
+
+// Desativa a separação de sílabas (hifenização) no documento inteiro
+Font.registerHyphenationCallback((word) => [word]);
 
 const styles = StyleSheet.create({
   page: {
@@ -19,21 +22,18 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
   },
-  
-  // A CAIXA INVISÍVEL: Alinhada exatamente com a moldura dourada da imagem
   caixaDeTexto: {
     position: 'absolute',
-    top: '24%',    // Distância exata do topo até à moldura interna
-    bottom: '24%', // Distância exata da base até à moldura interna
-    left: '22%',   // Distância da lateral esquerda
-    right: '22%',  // Distância da lateral direita
+    top: '24%',
+    bottom: '24%',
+    left: '22%',
+    right: '22%',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center', // Centraliza verticalmente dentro da caixa
-    alignItems: 'center',     // Centraliza horizontalmente dentro da caixa
-    padding: 10,              // Respiro extra para o texto nunca tocar na linha dourada
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
   },
-
   tituloCapa: {
     fontSize: 26, 
     color: '#d4af37',
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Times-Bold',
     textTransform: 'uppercase',
     marginBottom: 20,
-    // O texto vai quebrar de linha automaticamente ao atingir o limite da caixaDeTexto
   },
   ornamento: {
     width: 50,
@@ -65,8 +64,6 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     textAlign: 'center',
   },
-  
-  // CONTEÚDO DO LIVRO
   pageConteudo: {
     paddingTop: 80,
     paddingBottom: 80,
@@ -99,7 +96,9 @@ export const BookTemplate = ({ title, author, content }) => {
             <Text style={styles.tituloCapa}>{title}</Text>
             <View style={styles.ornamento} />
             <Text style={styles.autorCapa}>{author}</Text>
-            <Text style={styles.selo}>Coleção Clássicos - SP</Text>
+            
+            {/* Texto do selo atualizado */}
+            <Text style={styles.selo}>Coleção Clássicos</Text>
           </View>
         </View>
       </Page>
