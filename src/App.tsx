@@ -9,7 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import SearchPage from './pages/SearchPage';
 import ThemePage from './pages/ThemePage';
-import ThemesPage from './pages/ThemesPage'; // <-- Importação corrigida para o topo
+import ThemesPage from './pages/ThemesPage'; 
 import ArticlePage from './pages/ArticlePage';
 import AuthorsList from './pages/AuthorsList';
 import AuthorPage from './pages/AuthorPage';
@@ -29,6 +29,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminThemesTags from './pages/admin/AdminThemesTags';
 import AdminEditions from './pages/admin/AdminEditions';
 import AdminRejected from './pages/admin/AdminRejected';
+import { AdminClassics } from './pages/admin/AdminClassics'; // <-- Nova importação
 
 export default function App() {
   return (
@@ -39,7 +40,6 @@ export default function App() {
         <Route path="/cadastro" element={<Register />} />
         <Route path="/pesquisa" element={<SearchPage />} />
         
-        {/* Rota pública adicionada no lugar certo */}
         <Route path="/temas" element={<ThemesPage />} />
         
         <Route path="/temas/:slug" element={<ThemePage />} />
@@ -75,6 +75,7 @@ export default function App() {
         <Route path="/admin" element={<AdminHome />} />
         <Route path="/admin/revisoes" element={<AdminReviews />} />
         <Route path="/admin/temas" element={<AdminThemesTags />} />
+        <Route path="/admin/classicos" element={<AdminClassics />} /> {/* <-- Nova rota */}
         <Route
           path="/admin/edicoes"
           element={
