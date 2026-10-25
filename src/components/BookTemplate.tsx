@@ -1,5 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import capaFundo from './capa_padrao.jpg'; // O Vite vai embutir a imagem aqui
 
 const styles = StyleSheet.create({
   page: {
@@ -82,15 +83,12 @@ const styles = StyleSheet.create({
 });
 
 export const BookTemplate = ({ title, author, content }) => {
-  // Constrói o URL absoluto dinamicamente para o gerador localizar a imagem
-  const capaUrl = `${window.location.origin}/capa_padrao.jpg`;
-
   return (
     <Document>
-      {/* PÁGINA 1: CAPA */}
       <Page size="A4" style={styles.page}>
         <View style={styles.capaContainer}>
-          <Image src={capaUrl} style={styles.backgroundImage} />
+          {/* Agora usamos a variável importada diretamente */}
+          <Image src={capaFundo} style={styles.backgroundImage} />
           
           <View style={styles.textoSobreposto}>
             <Text style={styles.tituloCapa}>{title}</Text>
@@ -101,7 +99,6 @@ export const BookTemplate = ({ title, author, content }) => {
         </View>
       </Page>
 
-      {/* PÁGINA 2: CONTEÚDO */}
       <Page size="A4" style={styles.pageConteudo}>
         <Text style={styles.tituloCapitulo}>Prefácio da Edição</Text>
         <Text style={styles.texto}>{content}</Text>
