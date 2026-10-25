@@ -6,14 +6,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Times-Roman',
     backgroundColor: '#ffffff',
   },
-  
-  // CONTAINER DA CAPA
   capaContainer: {
     position: 'relative',
     width: '100%',
     height: '100%',
   },
-  // IMAGEM DE FUNDO
   backgroundImage: {
     position: 'absolute',
     minWidth: '100%',
@@ -24,22 +21,20 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-  // CAIXA DE TEXTO (Ajustada para caber dentro da moldura dourada da sua imagem)
   textoSobreposto: {
     position: 'absolute',
-    top: '25%',       // Empurra o texto para baixo para caber na moldura
-    bottom: '25%',    // Empurra o texto para cima
-    left: '20%',      // Margem lateral
-    right: '20%',     // Margem lateral
+    top: '25%',
+    bottom: '25%',
+    left: '20%',
+    right: '20%',
     justifyContent: 'center', 
     alignItems: 'center',
     display: 'flex',
     flexDirection: 'column',
   },
-
   tituloCapa: {
     fontSize: 32,
-    color: '#d4af37', // Dourado que combina com a sua imagem
+    color: '#d4af37',
     textAlign: 'center',
     fontFamily: 'Times-Bold',
     textTransform: 'uppercase',
@@ -59,15 +54,13 @@ const styles = StyleSheet.create({
   },
   selo: {
     position: 'absolute',
-    bottom: -60, // Posiciona o selo logo abaixo da caixa de texto, perto da borda inferior
+    bottom: -60,
     fontSize: 10,
     color: '#d4af37',
     textTransform: 'uppercase',
     letterSpacing: 2,
     opacity: 0.9,
   },
-
-  // ESTILOS DO CONTEÚDO
   pageConteudo: {
     padding: 50,
     fontFamily: 'Times-Roman',
@@ -88,28 +81,31 @@ const styles = StyleSheet.create({
   },
 });
 
-export const BookTemplate = ({ title, author, content }) => (
-  <Document>
-    {/* PÁGINA 1: CAPA */}
-    <Page size="A4" style={styles.page}>
-      <View style={styles.capaContainer}>
-        {/* Usando o JPG que você vai colocar na pasta public */}
-        <Image src="/capa_padrao.jpg" style={styles.backgroundImage} />
-        
-        {/* Texto centralizado na moldura */}
-        <View style={styles.textoSobreposto}>
-          <Text style={styles.tituloCapa}>{title}</Text>
-          <View style={styles.ornamento} />
-          <Text style={styles.autorCapa}>{author}</Text>
-          <Text style={styles.selo}>Coleção Clássicos - SP</Text>
-        </View>
-      </View>
-    </Page>
+export const BookTemplate = ({ title, author, content }) => {
+  // Constrói o URL absoluto dinamicamente para o gerador localizar a imagem
+  const capaUrl = `${window.location.origin}/capa_padrao.jpg`;
 
-    {/* PÁGINA 2: CONTEÚDO */}
-    <Page size="A4" style={styles.pageConteudo}>
-      <Text style={styles.tituloCapitulo}>Prefácio da Edição</Text>
-      <Text style={styles.texto}>{content}</Text>
-    </Page>
-  </Document>
-);
+  return (
+    <Document>
+      {/* PÁGINA 1: CAPA */}
+      <Page size="A4" style={styles.page}>
+        <View style={styles.capaContainer}>
+          <Image src={capaUrl} style={styles.backgroundImage} />
+          
+          <View style={styles.textoSobreposto}>
+            <Text style={styles.tituloCapa}>{title}</Text>
+            <View style={styles.ornamento} />
+            <Text style={styles.autorCapa}>{author}</Text>
+            <Text style={styles.selo}>Coleção Clássicos - SP</Text>
+          </View>
+        </View>
+      </Page>
+
+      {/* PÁGINA 2: CONTEÚDO */}
+      <Page size="A4" style={styles.pageConteudo}>
+        <Text style={styles.tituloCapitulo}>Prefácio da Edição</Text>
+        <Text style={styles.texto}>{content}</Text>
+      </Page>
+    </Document>
+  );
+};
