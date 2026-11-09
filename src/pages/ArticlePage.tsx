@@ -14,7 +14,6 @@ export default function ArticlePage() {
 
   useEffect(() => {
     if (!slug) {
-      console.error('Nenhum slug ou id fornecido no URL.');
       setError('Identificador não encontrado na rota.');
       setLoading(false);
       return;
@@ -25,7 +24,7 @@ export default function ArticlePage() {
         // 1. Incrementa a visualização na base de dados
         await supabase.rpc('increment_article_views', { article_slug: slug });
 
-        // 2. Busca os dados (REMOVIDA a relação conflituosa com 'editions')
+        // 2. Busca os dados APENAS com temas e autores (Sem edições para evitar o erro PGRST201)
         const { data, error: supabaseError } = await supabase
           .from('articles')
           .select('*, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
@@ -43,7 +42,7 @@ export default function ArticlePage() {
         }
       } catch (err: any) {
         console.error('Erro genérico ao procurar artigo:', err);
-        setError(`Erro de comunicação: ${err.message || 'Desconhecido'}`);
+        setError(`Erro de comunicação: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -73,10 +72,8 @@ export default function ArticlePage() {
     );
   }
 
-  // Se a edição não for carregada, usa o ano atual por defeito para a citação
   const publishYear = new Date().getFullYear();
 
-  // Tratamento do conteúdo
   let contentElement;
   try {
     if (typeof article.content === 'string') {
@@ -95,11 +92,8 @@ export default function ArticlePage() {
     <main className="min-h-screen bg-[#FDFBF7] py-16 px-4 sm:px-6 lg:px-8">
       <article className="max-w-3xl mx-auto bg-white p-8 sm:p-14 shadow-sm border border-ink-100 rounded-lg">
         
-        {/* Cabeçalho Académico / Metadados */}
         <header className="mb-10 pb-8 border-b border-ink-100">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono uppercase tracking-widest text-ink-400 mb-6">
-            
-            {/* Lado Esquerdo: Tag e Visualizações */}
             <div className="flex items-center gap-4">
               <span className="bg-ink-50 text-ink-600 px-2.5 py-1 rounded">Scientia Periodica</span>
               
@@ -111,25 +105,13 @@ export default function ArticlePage() {
                 {article.views || 0}
               </span>
             </div>
-
-            {/* Lado Direito: Autor */}
-            {article.users?.name && (
-              <span>Por <strong className="text-ink-900">{article.users.name}</strong></span>
-            )}
+            {article.users?.name && <span>Por <strong className="text-ink-900">{article.users.name}</strong></span>}
           </div>
           
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-ink-900 leading-tight mb-6">
-            {article.title}
-          </h1>
-
-          {article.summary && (
-            <p className="text-lg text-ink-700 leading-relaxed font-serif italic border-l-2 border-brass-300 pl-4">
-              {article.summary}
-            </p>
-          )}
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-ink-900 leading-tight mb-6">{article.title}</h1>
+          {article.summary && <p className="text-lg text-ink-700 leading-relaxed font-serif italic border-l-2 border-brass-300 pl-4">{article.summary}</p>}
         </header>
 
-        {/* Ferramentas de Citação */}
         <div className="mb-10 print:hidden">
           <StudentFeatures 
             articleTitle={article.title}
@@ -139,12 +121,10 @@ export default function ArticlePage() {
           />
         </div>
         
-        {/* Corpo do Artigo Organizado */}
         <div className="prose prose-lg max-w-none text-ink-900 font-serif leading-relaxed space-y-6">
           {contentElement}
         </div>
 
-        {/* Rodapé do Artigo */}
         <footer className="mt-16 pt-8 border-t border-ink-100 flex items-center justify-between text-xs text-ink-400 font-mono">
           <Link to="/" className="hover:text-ink-900 transition-colors">← Voltar à biblioteca</Link>
           <span>ISSN: 2965-0000</span>
