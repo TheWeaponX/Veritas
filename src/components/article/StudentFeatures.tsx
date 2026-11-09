@@ -42,16 +42,6 @@ export default function StudentFeatures({ articleTitle, authorName, publishYear,
       </div>
       
       <div className="flex flex-wrap gap-3">
-        <button 
-          onClick={handleSaveArticle}
-          className={`px-4 py-2 text-sm font-medium rounded-sm border transition-colors ${
-            saved 
-              ? 'bg-brass-500 text-ink-950 border-brass-500' 
-              : 'bg-white text-ink-700 border-ink-200 hover:border-brass-500'
-          }`}
-        >
-          {saved ? '★ Guardado' : 'Guardar Artigo'}
-        </button>
 
         <button 
           onClick={handleCopyCitation}
