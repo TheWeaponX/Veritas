@@ -24,10 +24,10 @@ export default function ArticlePage() {
         // 1. Incrementa a visualização na base de dados
         await supabase.rpc('increment_article_views', { article_slug: slug });
 
-        // 2. Busca os dados APENAS com temas e autores (Sem edições para evitar o erro PGRST201)
+        // 2. Busca APENAS as colunas exatas necessárias (Força o React a atualizar a cache)
         const { data, error: supabaseError } = await supabase
           .from('articles')
-          .select('*, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
+          .select('id, title, summary, content, views, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
           .eq('slug', slug)
           .maybeSingle();
 
