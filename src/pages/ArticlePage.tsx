@@ -27,7 +27,7 @@ export default function ArticlePage() {
         // 2. Busca os dados limpos
         const { data, error: supabaseError } = await supabase
           .from('articles')
-          .select('id, title, summary, content, views, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
+          .select('id, title, summary, content, views, references, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
           .eq('slug', slug)
           .maybeSingle();
 
@@ -119,7 +119,7 @@ export default function ArticlePage() {
           {contentElement}
         </div>
 
-        {/* 1. Secção de Bibliografia / Referências do Artigo (Texto Puro / Autónomo) */}
+        {/* 1. Secção de Bibliografia / Referências (Texto autónomo no fim) */}
         {article.references && (
           <div className="mt-16 pt-8 border-t border-ink-100">
             <h3 className="font-display text-base font-bold text-ink-900 uppercase tracking-wider mb-4">
@@ -149,6 +149,8 @@ export default function ArticlePage() {
           <Link to="/" className="hover:text-ink-900 transition-colors">← Voltar à biblioteca</Link>
           <span>ISSN: 2965-0000</span>
         </footer>
+
+      </article>
     </main>
   );
 }
