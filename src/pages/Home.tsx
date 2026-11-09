@@ -148,7 +148,7 @@ export default function Home() {
               {articles.map((article) => (
                 <Link 
                   key={article.id} 
-                  to={`/article/${article.slug}`}
+                  to={`/artigos/${article.slug}`}
                   className="group bg-white border border-ink-200/80 rounded-xl p-7 hover:border-brass-500 hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative"
                 >
                   <div className="space-y-3">
