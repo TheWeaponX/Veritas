@@ -28,6 +28,15 @@ export default function ArticlePage() {
     }
     fetchArticle();
   }, [slug]);
+  if (error) {
+        console.error('Erro ao buscar artigo:', error);
+      }
+
+      console.log('Dados recebidos do Supabase:', data); // <--- Adicione isto
+
+      if (data) {
+        setArticle(data);
+      }
 
   if (loading) return <div className="max-w-4xl mx-auto px-4 py-24 text-sm text-ink-500">Carregando artigo...</div>;
 
