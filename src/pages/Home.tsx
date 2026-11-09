@@ -1,113 +1,145 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search } from 'lucide-react';
-import { getCurrentEdition, listArticlesInEdition } from '../services/editions';
+import { supabase } from '../lib/supabase';
 
 export default function Home() {
-  const [query, setQuery] = useState('');
-  const [edition, setEdition] = useState<any>(null);
+  const [latestEdition, setLatestEdition] = useState<any>(null);
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    async function fetchHomeData() {
       try {
-        const ed = await getCurrentEdition();
-        setEdition(ed);
-        if (ed) setArticles(await listArticlesInEdition(ed.id));
-      } catch (e: any) {
-        setError(e.message);
+        // Busca a edição mais recente publicada
+        const { data: editionData } = await supabase
+          .from('editions')
+          .select('*')
+          .order('number', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (editionData) {
+          setLatestEdition(editionData);
+
+          // Busca os artigos associados a esta edição
+          const { data: articlesData } = await supabase
+            .from('articles')
+            .select('*, themes:theme_id(name, slug), users:author_id(name)')
+            .eq('edition_id', editionData.id)
+            .eq('status', 'published')
+            .order('position', { ascending: true });
+
+          setArticles(articlesData ?? []);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar dados da página inicial:', err);
       } finally {
         setLoading(false);
       }
-    })();
+    }
+
+    fetchHomeData();
   }, []);
 
-  const coverArticle = articles.find((a) => a.id === edition?.cover_article_id);
-  const restArticles = articles.filter((a) => a.id !== edition?.cover_article_id);
+  if (loading) {
+    return <div className="max-w-5xl mx-auto px-6 py-32 text-center text-sm text-ink-500 font-serif">A carregar biblioteca...</div>;
+  }
 
   return (
-    <div>
-      {/* HERO */}
-      <section className="bg-ink-900 text-paper-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-20 text-center">
-          <h1 className="font-display text-4xl sm:text-5xl font-semibold leading-tight">
-            Conhecimento científico, organizado para todos.
-          </h1>
-          <p className="mt-4 text-ink-100 max-w-xl mx-auto">
-            Uma edição nova toda semana, escrita por jovens estudantes e cientistas em formação.
-          </p>
+    <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-12">
+        
+        {/* DESTAQUE DA EDIÇÃO ATUAL / LIBER PRIMUS */}
+        {latestEdition ? (
+          <section className="bg-white border border-ink-100 rounded-xl p-8 sm:p-12 shadow-sm relative overflow-hidden">
+            
+            {/* Elemento decorativo clássico */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-ink-50 rounded-bl-full pointer-events-none opacity-50" />
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              window.location.href = `/pesquisa?q=${encodeURIComponent(query)}`;
-            }}
-            className="mt-8 flex items-center gap-2 bg-paper-50 rounded-sm p-1.5 max-w-xl mx-auto"
-          >
-            <Search className="ml-2 text-ink-500 shrink-0" size={18} />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Pesquise um conceito, fenômeno ou área da ciência..."
-              className="flex-1 bg-transparent outline-none text-sm text-ink-900 px-1 py-2"
-            />
-            <button type="submit" className="bg-brass-500 hover:bg-brass-400 text-ink-950 text-sm font-medium px-4 py-2 rounded-sm transition-colors">
-              Pesquisar
-            </button>
-          </form>
-        </div>
-      </section>
-
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
-        {error && <p className="text-red-600 text-sm">Não foi possível carregar a edição: {error}</p>}
-
-        {loading ? (
-          <p className="text-sm text-ink-500">Carregando...</p>
-        ) : !edition ? (
-          <div className="border border-dashed border-ink-100 rounded-sm p-10 text-center text-sm text-ink-500">
-            Nenhuma edição publicada ainda. Assim que a primeira edição for fechada pelo admin, ela aparece aqui.
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-between mb-8 border-b border-ink-100 pb-4">
-              <div>
-                <span className="specimen-tag">Edição #{edition.number}</span>
-                <h2 className="font-display text-2xl font-semibold mt-2">
-                  {edition.title || `Edição de ${new Date(edition.publish_date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}`}
-                </h2>
-                {edition.description && <p className="text-sm text-ink-500 mt-1 max-w-xl">{edition.description}</p>}
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-ink-100">
+                <div>
+                  <span className="inline-block font-mono text-xs uppercase tracking-widest bg-ink-900 text-white px-3 py-1 rounded mb-2">
+                    Edição #{latestEdition.number}
+                  </span>
+                  <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink-900">
+                    {latestEdition.title || 'Scientia Periodica: Liber Primus'}
+                  </h1>
+                </div>
+                <Link 
+                  to="/editions" 
+                  className="text-xs font-mono uppercase tracking-wider text-ink-600 hover:text-ink-950 transition-colors self-start sm:self-auto"
+                >
+                  Ver edições anteriores →
+                </Link>
               </div>
-              <Link to="/edicoes" className="text-sm text-brass-600 hover:text-brass-500 shrink-0">Edições anteriores →</Link>
+
+              {/* Descrição fluida e elegante */}
+              <div className="prose prose-lg text-ink-700 font-serif leading-relaxed mb-8 max-w-none">
+                <p>
+                  {latestEdition.description || 
+                    "O Liber Primus é o marco inaugural da nossa jornada pelo conhecimento, concebido como a pedra angular da Scientia Periodica para propor um diálogo direto entre os fenómenos naturais, a vida e as criações humanas. Rompendo com as barreiras tradicionais do saber, este volume de estreia foca-se na intersecção de disciplinas que moldam a nova realidade, explorando as dualidades ocultas da matéria, os engenhosos mecanismos de defesa e as origens aquáticas da Biologia, do limiar entre a melodia acidental e o perigo físico na acústica, e as eficiências da liberdade e robustez que sustentam os sistemas digitais modernos."}
+                </p>
+              </div>
             </div>
-
-            {coverArticle && (
-              <Link to={`/artigos/${coverArticle.slug}`} className="block border border-ink-100 rounded-sm bg-paper-50 p-8 mb-8 hover:border-brass-500 transition-colors">
-                <span className="text-xs font-mono uppercase tracking-wider text-brass-600">Destaque da semana</span>
-                <h3 className="font-display text-2xl font-semibold mt-2">{coverArticle.title}</h3>
-                {coverArticle.summary && <p className="text-ink-600 mt-2">{coverArticle.summary}</p>}
-                {coverArticle.users?.name && <p className="text-xs text-ink-500 mt-3">por {coverArticle.users.name}</p>}
-              </Link>
-            )}
-
-            <h3 className="font-display text-lg font-semibold mb-4">Sumário desta edição</h3>
-            {restArticles.length === 0 && !coverArticle ? (
-              <p className="text-sm text-ink-500">Nenhum artigo nesta edição.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {restArticles.map((a) => (
-                  <Link key={a.id} to={`/artigos/${a.slug}`} className="border border-ink-100 rounded-sm p-4 bg-paper-50 hover:border-brass-500 transition-colors">
-                    <h4 className="font-display text-base font-medium">{a.title}</h4>
-                    {a.summary && <p className="text-sm text-ink-500 mt-1 line-clamp-2">{a.summary}</p>}
-                    {a.users?.name && <p className="text-xs text-ink-500 mt-2">por {a.users.name}</p>}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </>
+          </section>
+        ) : (
+          <div className="bg-white border border-ink-100 rounded-xl p-8 text-center">
+            <h1 className="font-display text-2xl font-bold text-ink-900 mb-2">Scientia Periodica</h1>
+            <p className="text-ink-600 font-serif">Nenhuma edição publicada no momento.</p>
+          </div>
         )}
-      </section>
+
+        {/* SUMÁRIO DA EDIÇÃO */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-display text-xl font-bold text-ink-900 tracking-wide uppercase text-sm">
+              Sumário desta edição
+            </h2>
+            <span className="text-xs font-mono text-ink-400">
+              {articles.length} {articles.length === 1 ? 'artigo publicado' : 'artigos publicados'}
+            </span>
+          </div>
+
+          {articles.length === 0 ? (
+            <div className="bg-white border border-ink-100 rounded-lg p-8 text-center text-ink-500 font-serif text-sm">
+              Ainda não existem artigos publicados nesta edição.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {articles.map((article) => (
+                <Link 
+                  key={article.id} 
+                  to={`/article/${article.slug}`}
+                  className="group bg-white border border-ink-100 rounded-lg p-6 hover:border-ink-300 hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    {article.themes?.name && (
+                      <span className="inline-block text-[10px] font-mono uppercase tracking-wider bg-ink-50 text-ink-600 px-2.5 py-0.5 rounded mb-3">
+                        {article.themes.name}
+                      </span>
+                    )}
+                    <h3 className="font-display text-xl font-bold text-ink-900 group-hover:text-brass-700 transition-colors mb-2 leading-snug">
+                      {article.title}
+                    </h3>
+                    {article.summary && (
+                      <p className="text-sm text-ink-600 font-serif line-clamp-2 leading-relaxed mb-4">
+                        {article.summary}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="pt-4 border-t border-ink-50 flex items-center justify-between text-xs font-mono text-ink-500">
+                    <span>Por {article.users?.name || 'Autor'}</span>
+                    <span className="group-hover:translate-x-1 transition-transform font-bold text-ink-900">Ler artigo →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+      </div>
     </div>
   );
 }
