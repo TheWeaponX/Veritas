@@ -24,7 +24,7 @@ export default function ArticlePage() {
         // 1. Incrementa a visualização na base de dados
         await supabase.rpc('increment_article_views', { article_slug: slug });
 
-        // 2. Busca APENAS as colunas exatas necessárias (Força o React a atualizar a cache)
+        // 2. Busca os dados limpos (Garante que "editions" não existe aqui)
         const { data, error: supabaseError } = await supabase
           .from('articles')
           .select('id, title, summary, content, views, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
@@ -62,8 +62,10 @@ export default function ArticlePage() {
   if (error || !article) {
     return (
       <div className="max-w-2xl mx-auto px-6 py-32 text-center">
-        <h1 className="font-display text-3xl font-semibold mb-3 text-ink-900">Artigo não encontrado</h1>
-        <p className="text-sm text-ink-600 mb-6">O registo procurado não se encontra disponível neste volume.</p>
+        {/* TÍTULO MODIFICADO PARA TESTE VISUAL */}
+        <h1 className="font-display text-3xl font-semibold mb-3 text-red-600">TESTE DE ATUALIZAÇÃO</h1>
+        <p className="text-sm text-ink-600 mb-6">Se está a ver este texto a vermelho, a nova versão finalmente chegou ao servidor!</p>
+        
         {error && <p className="text-xs text-red-600 mb-6 bg-red-50 border border-red-100 p-3 rounded max-w-md mx-auto">Detalhes: {error}</p>}
         <Link to="/" className="inline-block bg-ink-900 text-white px-6 py-2.5 rounded text-sm font-medium hover:bg-ink-800 transition-colors shadow-sm">
           Voltar ao Início
