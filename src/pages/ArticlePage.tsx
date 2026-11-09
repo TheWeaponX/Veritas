@@ -115,6 +115,16 @@ export default function ArticlePage() {
           )}
         </header>
 
+{/* Ferramentas de Citação */}
+        <div className="mb-10 print:hidden">
+          <StudentFeatures 
+            articleTitle={article.title}
+            authorName={article.users?.name || 'Autor Desconhecido'}
+            publishYear={publishYear}
+            articleId={article.id}
+          />
+        </div>
+        
         {/* Corpo do Artigo Organizado */}
         <div className="prose prose-lg max-w-none text-ink-900 font-serif leading-relaxed space-y-6">
           {contentElement}
