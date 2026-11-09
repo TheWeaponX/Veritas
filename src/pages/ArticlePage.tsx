@@ -128,16 +128,30 @@ export default function ArticlePage() {
           {contentElement}
         </div>
 
-        {/* 1. Secção de Fontes / Referências vindas da tabela 'references' */}
+        {/* 1. Secção de Fontes / Referências limpa e formatada */}
         {article.references && article.references.length > 0 && (
           <div className="mt-16 pt-8 border-t border-ink-100">
             <h3 className="font-display text-base font-bold text-ink-900 uppercase tracking-wider mb-4">
               Referências e Fontes
             </h3>
-            <ul className="text-sm text-ink-700 font-serif leading-relaxed space-y-2 list-disc list-inside">
+            <ul className="text-sm text-ink-700 font-serif leading-relaxed space-y-3">
               {article.references.map((refItem: any, index: number) => (
-                <li key={index}>
-                  {refItem.text || refItem.content || refItem.reference || JSON.stringify(refItem)}
+                <li key={index} className="pl-2 border-l-2 border-brass-300">
+                  {/* Se a referência tiver um formato estruturado */}
+                  {refItem.title ? (
+                    <div>
+                      <strong className="text-ink-900">{refItem.author || 'Autor desconhecido'}</strong> ({refItem.year || publishYear}). <em>{refItem.title}</em>. 
+                      {refItem.publication && <span> {refItem.publication}.</span>}
+                      {refItem.url && (
+                        <a href={refItem.url} target="_blank" rel="noopener noreferrer" className="block text-xs text-blue-600 hover:underline mt-0.5 truncate">
+                          {refItem.url}
+                        </a>
+                      )}
+                    </div>
+                  ) : (
+                    // Fallback caso seja apenas texto livre
+                    <span>{refItem.text || refItem.content || refItem.reference || JSON.stringify(refItem)}</span>
+                  )}
                 </li>
               ))}
             </ul>
