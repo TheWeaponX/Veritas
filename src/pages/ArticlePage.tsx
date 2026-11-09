@@ -13,9 +13,6 @@ export default function ArticlePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('Todos os parâmetros da rota:', params);
-    console.log('Parâmetro final usado como slug:', slug);
-
     if (!slug) {
       console.error('Nenhum slug ou id fornecido no URL.');
       setError('Identificador não encontrado na rota.');
@@ -25,22 +22,21 @@ export default function ArticlePage() {
 
     async function fetchArticle() {
       try {
-        console.log('A iniciar procura do artigo no Supabase...');
+        // 1. Incrementa a visualização na base de dados primeiro
+        await supabase.rpc('increment_article_views', { article_slug: slug });
+
+        // 2. Vai buscar os dados do artigo (com a contagem já atualizada e dados da edição para a citação)
         const { data, error: supabaseError } = await supabase
           .from('articles')
-          .select('*, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
+          .select('*, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug), editions(number, publish_date)')
           .eq('slug', slug)
           .maybeSingle();
 
         if (supabaseError) {
-          console.error('Erro retornado pelo Supabase:', supabaseError);
           throw new Error(supabaseError.message);
         }
 
-        console.log('Dados recebidos do Supabase:', data);
-
         if (!data) {
-          console.warn('Nenhum artigo encontrado com o slug:', slug);
           setError('O artigo não existe na base de dados.');
         } else {
           setArticle(data);
@@ -50,7 +46,6 @@ export default function ArticlePage() {
         setError(`Erro de comunicação: ${err.message || 'Desconhecido'}`);
       } finally {
         setLoading(false);
-        console.log('Processo de carregamento finalizado.');
       }
     }
 
@@ -78,7 +73,12 @@ export default function ArticlePage() {
     );
   }
 
-  // Tratamento do conteúdo (Garante que não falha a renderizar se o objeto JSON estiver mal formatado)
+  // Define o ano de publicação para a ferramenta de Citação (ABNT)
+  const publishYear = article.editions?.publish_date 
+    ? new Date(article.editions.publish_date).getFullYear() 
+    : new Date().getFullYear();
+
+  // Tratamento do conteúdo
   let contentElement;
   try {
     if (typeof article.content === 'string') {
@@ -100,8 +100,24 @@ export default function ArticlePage() {
         {/* Cabeçalho Académico / Metadados */}
         <header className="mb-10 pb-8 border-b border-ink-100">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono uppercase tracking-widest text-ink-400 mb-6">
-            <span className="bg-ink-50 text-ink-600 px-2.5 py-1 rounded">Scientia Periodica</span>
-            {article.users?.name && <span>Por <strong className="text-ink-900">{article.users.name}</strong></span>}
+            
+            {/* Lado Esquerdo: Tag e Visualizações */}
+            <div className="flex items-center gap-4">
+              <span className="bg-ink-50 text-ink-600 px-2.5 py-1 rounded">Scientia Periodica</span>
+              
+              <span className="flex items-center gap-1.5 text-ink-500" title="Visualizações totais">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                {article.views || 0}
+              </span>
+            </div>
+
+            {/* Lado Direito: Autor */}
+            {article.users?.name && (
+              <span>Por <strong className="text-ink-900">{article.users.name}</strong></span>
+            )}
           </div>
           
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-ink-900 leading-tight mb-6">
@@ -115,7 +131,7 @@ export default function ArticlePage() {
           )}
         </header>
 
-{/* Ferramentas de Citação */}
+        {/* Ferramentas de Citação */}
         <div className="mb-10 print:hidden">
           <StudentFeatures 
             articleTitle={article.title}
