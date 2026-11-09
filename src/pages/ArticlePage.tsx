@@ -13,12 +13,15 @@ export default function ArticlePage() {
     async function fetchArticle() {
       const { data, error } = await supabase
         .from('articles')
-        .select('*, users:author_id(name, bio), themes(name), editions(number, publish_date)')
+        .select('*, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug), editions(number, publish_date)')
         .eq('slug', slug)
-        .eq('status', 'published')
-        .single();
+        .maybeSingle();
 
-      if (!error && data) {
+      if (error) {
+        console.error('Erro ao buscar artigo:', error);
+      }
+
+      if (data) {
         setArticle(data);
       }
       setLoading(false);
@@ -32,6 +35,7 @@ export default function ArticlePage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-24 text-center">
         <h1 className="font-display text-2xl font-semibold mb-2 text-ink-900">Artigo não encontrado</h1>
+        <p className="text-sm text-ink-600 mb-4">O slug procurado foi: <code className="bg-gray-100 px-2 py-1 rounded text-red-600">{slug}</code></p>
         <Link to="/" className="text-brass-600 hover:text-brass-500 text-sm font-medium">Voltar à página inicial</Link>
       </div>
     );
