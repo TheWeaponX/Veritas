@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import ArticleBody from '../components/article/ArticleBody';
+import StudentFeatures from '../components/article/StudentFeatures';
 
 export default function ArticlePage() {
   const params = useParams();
