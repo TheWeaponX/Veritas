@@ -119,9 +119,23 @@ export default function ArticlePage() {
           {contentElement}
         </div>
 
-        {/* Ferramentas de Citação / Bibliografia (No Fim da Página) */}
-        <div className="mt-16 pt-8 border-t border-ink-100 print:hidden">
-          <h3 className="font-display text-lg font-bold text-ink-900 mb-4">Como citar este artigo</h3>
+        {/* 1. Secção de Bibliografia / Referências do Artigo (Texto Puro / Autónomo) */}
+        {article.references && (
+          <div className="mt-16 pt-8 border-t border-ink-100">
+            <h3 className="font-display text-base font-bold text-ink-900 uppercase tracking-wider mb-4">
+              Referências Bibliográficas
+            </h3>
+            <div className="text-sm text-ink-700 font-serif leading-relaxed space-y-2">
+              <p>{article.references}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 2. Ferramentas de Citação ABNT (Separadas, no pé da página) */}
+        <div className="mt-10 pt-6 border-t border-dashed border-ink-200 print:hidden">
+          <h4 className="text-xs font-mono uppercase tracking-widest text-ink-500 mb-3">
+            Ferramenta de Citação Académica
+          </h4>
           <StudentFeatures 
             articleTitle={article.title}
             authorName={article.users?.name || 'Autor Desconhecido'}
@@ -135,8 +149,6 @@ export default function ArticlePage() {
           <Link to="/" className="hover:text-ink-900 transition-colors">← Voltar à biblioteca</Link>
           <span>ISSN: 2965-0000</span>
         </footer>
-
-      </article>
     </main>
   );
 }
