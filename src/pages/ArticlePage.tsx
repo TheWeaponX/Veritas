@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import StudentFeatures from '../components/article/StudentFeatures';
+import ArticleBody from '../components/article/ArticleBody';
 
 export default function ArticlePage() {
   const { slug } = useParams();
@@ -11,7 +12,6 @@ export default function ArticlePage() {
   useEffect(() => {
     if (!slug) return;
     async function fetchArticle() {
-      // Query simplificada para evitar conflitos de relações múltiplas no Supabase
       const { data, error } = await supabase
         .from('articles')
         .select('*, users:author_id(name, biography)')
@@ -21,8 +21,6 @@ export default function ArticlePage() {
       if (error) {
         console.error('Erro ao buscar artigo:', error);
       }
-
-      console.log('Dados recebidos do Supabase:', data);
 
       if (data) {
         setArticle(data);
@@ -76,9 +74,13 @@ export default function ArticlePage() {
         />
       </div>
 
-      {/* Conteúdo do Artigo */}
+      {/* Conteúdo do Artigo (Tratado pelo componente ArticleBody) */}
       <div className="prose prose-lg max-w-none text-ink-900 font-serif leading-relaxed">
-        <div dangerouslySetInnerHTML={{ __html: article.content }} />
+        {typeof article.content === 'string' ? (
+          <div dangerouslySetInnerHTML={{ __html: article.content }} />
+        ) : (
+          <ArticleBody content={article.content} />
+        )}
       </div>
 
     </article>
