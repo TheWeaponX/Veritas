@@ -10,7 +10,6 @@ export default function Home() {
   useEffect(() => {
     async function fetchHomeData() {
       try {
-        // Busca a edição mais recente publicada
         const { data: editionData } = await supabase
           .from('editions')
           .select('*')
@@ -21,7 +20,6 @@ export default function Home() {
         if (editionData) {
           setLatestEdition(editionData);
 
-          // Busca os artigos associados a esta edição
           const { data: articlesData } = await supabase
             .from('articles')
             .select('*, themes:theme_id(name, slug), users:author_id(name)')
@@ -42,67 +40,107 @@ export default function Home() {
   }, []);
 
   if (loading) {
-    return <div className="max-w-5xl mx-auto px-6 py-32 text-center text-sm text-ink-500 font-serif">A carregar biblioteca...</div>;
+    return <div className="max-w-5xl mx-auto px-6 py-32 text-center text-sm text-ink-500 font-serif">A carregar o volume...</div>;
   }
 
-  return (
-    <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto space-y-12">
-        
-        {/* DESTAQUE DA EDIÇÃO ATUAL / LIBER PRIMUS */}
-        {latestEdition ? (
-          <section className="bg-white border border-ink-100 rounded-xl p-8 sm:p-12 shadow-sm relative overflow-hidden">
-            
-            {/* Elemento decorativo clássico */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-ink-50 rounded-bl-full pointer-events-none opacity-50" />
+  const publishYear = latestEdition?.publish_date 
+    ? new Date(latestEdition.publish_date).getFullYear() 
+    : new Date().getFullYear();
 
-            <div className="relative z-10">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-ink-100">
-                <div>
-                  <span className="inline-block font-mono text-xs uppercase tracking-widest bg-ink-900 text-white px-3 py-1 rounded mb-2">
-                    Edição #{latestEdition.number}
-                  </span>
-                  <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink-900">
-                    {latestEdition.title || 'Scientia Periodica: Liber Primus'}
-                  </h1>
-                </div>
-                <Link 
-                  to="/editions" 
-                  className="text-xs font-mono uppercase tracking-wider text-ink-600 hover:text-ink-950 transition-colors self-start sm:self-auto"
-                >
-                  Ver edições anteriores →
-                </Link>
+  return (
+    <div className="min-h-screen bg-[#FDFBF7] text-ink-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-16">
+        
+        {/* CABEÇALHO DO PROJETO / HERO */}
+        <header className="text-center max-w-2xl mx-auto space-y-4 pt-4">
+          <div className="inline-block font-mono text-xs uppercase tracking-widest text-brass-700 bg-brass-50 border border-brass-200 px-3.5 py-1.5 rounded-full">
+            Enciclopédia Científica de Acesso Aberto
+          </div>
+          <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight text-ink-900">
+            Scientia Periodica
+          </h1>
+          <p className="font-serif text-base sm:text-lg text-ink-600 leading-relaxed italic">
+            "Um espaço onde a química, a biologia, a acústica e a tecnologia convergem numa única e contínua busca pela verdade."
+          </p>
+        </header>
+
+        {/* VITRINE DA EDIÇÃO ATUAL (ESTILO CAPA DE LIVRO ANTIGO / CLÁSSICO) */}
+        {latestEdition ? (
+          <section className="bg-white border-2 border-ink-900/10 rounded-2xl p-8 sm:p-12 shadow-xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            {/* Detalhe estético lateral (lombada simulada) */}
+            <div className="absolute top-0 left-0 w-3 h-full bg-brass-700 hidden lg:block" />
+
+            <div className="lg:col-span-8 space-y-6">
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs font-bold uppercase tracking-wider bg-ink-900 text-white px-3 py-1 rounded">
+                  Edição #{latestEdition.number}
+                </span>
+                <span className="text-xs font-mono text-ink-500">
+                  Ano {publishYear} • ISSN: 2965-0000
+                </span>
               </div>
 
-              {/* Descrição fluida e elegante */}
-              <div className="prose prose-lg text-ink-700 font-serif leading-relaxed mb-8 max-w-none">
+              <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink-900 leading-tight">
+                {latestEdition.title || 'Liber Primus'}
+              </h2>
+
+              <div className="prose font-serif text-ink-700 leading-relaxed text-base sm:text-lg">
                 <p>
                   {latestEdition.description || 
-                    "O Liber Primus é o marco inaugural da nossa jornada pelo conhecimento, concebido como a pedra angular da Scientia Periodica para propor um diálogo direto entre os fenómenos naturais, a vida e as criações humanas. Rompendo com as barreiras tradicionais do saber, este volume de estreia foca-se na intersecção de disciplinas que moldam a nova realidade, explorando as dualidades ocultas da matéria, os engenhosos mecanismos de defesa e as origens aquáticas da Biologia, do limiar entre a melodia acidental e o perigo físico na acústica, e as eficiências da liberdade e robustez que sustentam os sistemas digitais modernos."}
+                    "O Liber Primus é o marco inaugural da nossa jornada pelo conhecimento, concebido como a pedra angular da Scientia Periodica para propor um diálogo direto entre os fenómenos naturais, a vida e as criações humanas. Rompendo com as barreiras tradicionais do saber, este volume de estreia foca-se na intersecção de disciplinas que moldam a nova realidade."}
                 </p>
               </div>
+
+              <div className="pt-2 flex items-center gap-4">
+                <span className="text-xs font-mono uppercase tracking-widest text-ink-400">
+                  {articles.length} Artigos Publicados neste Volume
+                </span>
+              </div>
             </div>
+
+            {/* Coluna da Direita: Selo Editorial / Informação extra */}
+            <div className="lg:col-span-4 bg-ink-50 border border-ink-200/60 rounded-xl p-6 flex flex-col justify-between space-y-6 text-center">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-ink-400 mb-1">Volume Inaugural</p>
+                <p className="font-display text-2xl font-bold text-ink-900">Liber Primus</p>
+                <div className="w-12 h-0.5 bg-brass-600 mx-auto my-3" />
+                <p className="text-xs font-serif text-ink-600 italic">
+                  Curadoria dedicada à união entre exatas, naturais e ciências humanas.
+                </p>
+              </div>
+
+              <Link 
+                to="/editions" 
+                className="inline-block w-full bg-ink-900 text-white py-2.5 px-4 rounded text-xs font-mono uppercase tracking-wider hover:bg-ink-800 transition-colors shadow-sm"
+              >
+                Explorar Edições Anteriores
+              </Link>
+            </div>
+
           </section>
         ) : (
           <div className="bg-white border border-ink-100 rounded-xl p-8 text-center">
-            <h1 className="font-display text-2xl font-bold text-ink-900 mb-2">Scientia Periodica</h1>
-            <p className="text-ink-600 font-serif">Nenhuma edição publicada no momento.</p>
+            <p className="font-serif text-ink-600">Nenhuma edição publicada no momento.</p>
           </div>
         )}
 
-        {/* SUMÁRIO DA EDIÇÃO */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-xl font-bold text-ink-900 tracking-wide uppercase text-sm">
-              Sumário desta edição
-            </h2>
-            <span className="text-xs font-mono text-ink-400">
-              {articles.length} {articles.length === 1 ? 'artigo publicado' : 'artigos publicados'}
+        {/* SUMÁRIO DETALHADO DA EDIÇÃO */}
+        <section className="space-y-6">
+          <div className="border-b border-ink-200 pb-4 flex items-end justify-between">
+            <div>
+              <span className="text-xs font-mono uppercase tracking-widest text-brass-700">Índice Académico</span>
+              <h3 className="font-display text-2xl sm:text-3xl font-bold text-ink-900">
+                Sumário do Volume
+              </h3>
+            </div>
+            <span className="text-xs font-mono text-ink-500 hidden sm:inline-block">
+              Clique num artigo para iniciar a leitura
             </span>
           </div>
 
           {articles.length === 0 ? (
-            <div className="bg-white border border-ink-100 rounded-lg p-8 text-center text-ink-500 font-serif text-sm">
+            <div className="bg-white border border-ink-100 rounded-lg p-12 text-center text-ink-500 font-serif text-sm">
               Ainda não existem artigos publicados nesta edição.
             </div>
           ) : (
@@ -111,27 +149,36 @@ export default function Home() {
                 <Link 
                   key={article.id} 
                   to={`/article/${article.slug}`}
-                  className="group bg-white border border-ink-100 rounded-lg p-6 hover:border-ink-300 hover:shadow-md transition-all flex flex-col justify-between"
+                  className="group bg-white border border-ink-200/80 rounded-xl p-7 hover:border-brass-500 hover:shadow-lg transition-all duration-300 flex flex-col justify-between relative"
                 >
-                  <div>
-                    {article.themes?.name && (
-                      <span className="inline-block text-[10px] font-mono uppercase tracking-wider bg-ink-50 text-ink-600 px-2.5 py-0.5 rounded mb-3">
-                        {article.themes.name}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      {article.themes?.name ? (
+                        <span className="text-[11px] font-mono uppercase tracking-widest bg-ink-50 text-brass-800 border border-brass-200/50 px-2.5 py-1 rounded">
+                          {article.themes.name}
+                        </span>
+                      ) : <span />}
+                      <span className="text-xs font-mono text-ink-400 group-hover:text-brass-700 transition-colors">
+                        Artigo de Investigação
                       </span>
-                    )}
-                    <h3 className="font-display text-xl font-bold text-ink-900 group-hover:text-brass-700 transition-colors mb-2 leading-snug">
+                    </div>
+
+                    <h4 className="font-display text-xl sm:text-2xl font-bold text-ink-900 group-hover:text-brass-700 transition-colors leading-snug">
                       {article.title}
-                    </h3>
+                    </h4>
+
                     {article.summary && (
-                      <p className="text-sm text-ink-600 font-serif line-clamp-2 leading-relaxed mb-4">
+                      <p className="text-sm text-ink-600 font-serif line-clamp-3 leading-relaxed">
                         {article.summary}
                       </p>
                     )}
                   </div>
 
-                  <div className="pt-4 border-t border-ink-50 flex items-center justify-between text-xs font-mono text-ink-500">
-                    <span>Por {article.users?.name || 'Autor'}</span>
-                    <span className="group-hover:translate-x-1 transition-transform font-bold text-ink-900">Ler artigo →</span>
+                  <div className="mt-6 pt-4 border-t border-ink-100 flex items-center justify-between text-xs font-mono">
+                    <span className="text-ink-600 font-medium">Por <strong className="text-ink-900">{article.users?.name || 'Autor'}</strong></span>
+                    <span className="text-brass-700 group-hover:translate-x-1.5 transition-transform font-bold flex items-center gap-1">
+                      Ler na íntegra →
+                    </span>
                   </div>
                 </Link>
               ))}
