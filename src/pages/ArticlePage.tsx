@@ -24,10 +24,19 @@ export default function ArticlePage() {
         // 1. Incrementa a visualização na base de dados
         await supabase.rpc('increment_article_views', { article_slug: slug });
 
-        // 2. Busca os dados reais e existentes (SEM a coluna 'references' que causava erro)
+        // 2. Busca o artigo e as referências associadas na tabela 'references'
         const { data, error: supabaseError } = await supabase
           .from('articles')
-          .select('id, title, summary, content, views, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
+          .select(`
+            id, 
+            title, 
+            summary, 
+            content, 
+            views, 
+            users:author_id(name, biography), 
+            themes!articles_theme_id_fkey(name, slug),
+            references(*)
+          `)
           .eq('slug', slug)
           .maybeSingle();
 
@@ -114,13 +123,29 @@ export default function ArticlePage() {
           {article.summary && <p className="text-lg text-ink-700 leading-relaxed font-serif italic border-l-2 border-brass-300 pl-4">{article.summary}</p>}
         </header>
 
-        {/* Corpo do Artigo Organizado (Inclui o texto original do autor e as referências que foram inseridas no editor) */}
+        {/* Corpo do Artigo Organizado */}
         <div className="prose prose-lg max-w-none text-ink-900 font-serif leading-relaxed space-y-6">
           {contentElement}
         </div>
 
-        {/* Ferramenta de Citação ABNT Separada no Pé da Página */}
-        <div className="mt-16 pt-6 border-t border-dashed border-ink-200 print:hidden">
+        {/* 1. Secção de Fontes / Referências vindas da tabela 'references' */}
+        {article.references && article.references.length > 0 && (
+          <div className="mt-16 pt-8 border-t border-ink-100">
+            <h3 className="font-display text-base font-bold text-ink-900 uppercase tracking-wider mb-4">
+              Referências e Fontes
+            </h3>
+            <ul className="text-sm text-ink-700 font-serif leading-relaxed space-y-2 list-disc list-inside">
+              {article.references.map((refItem: any, index: number) => (
+                <li key={index}>
+                  {refItem.text || refItem.content || refItem.reference || JSON.stringify(refItem)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 2. Ferramentas de Citação ABNT Separadas no Pé da Página */}
+        <div className="mt-10 pt-6 border-t border-dashed border-ink-200 print:hidden">
           <h4 className="text-xs font-mono uppercase tracking-widest text-ink-500 mb-3">
             Ferramenta de Citação Académica
           </h4>
