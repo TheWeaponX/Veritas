@@ -62,7 +62,16 @@ export async function createDraft(authorId: string, title: string) {
 }
 
 export async function saveArticle(articleId: string, patch: Partial<Article>) {
-  const { data, error } = await supabase.from('articles').update(patch).eq('id', articleId).select().single();
+  if (patch.title) {
+    patch.slug = slugify(patch.title);
+  }
+
+  const { data, error } = await supabase
+    .from('articles')
+    .update(patch)
+    .eq('id', articleId)
+    .select()
+    .single();
   if (error) throw error;
   return data as Article;
 }
