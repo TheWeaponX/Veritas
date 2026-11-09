@@ -6,7 +6,7 @@ import StudentFeatures from '../components/article/StudentFeatures';
 
 export default function ArticlePage() {
   const params = useParams();
-  const slug = params.slug || params.id; // Tenta capturar quer venha como 'slug' quer como 'id' da rota
+  const slug = params.slug || params.id; 
   
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -22,13 +22,13 @@ export default function ArticlePage() {
 
     async function fetchArticle() {
       try {
-        // 1. Incrementa a visualização na base de dados primeiro
+        // 1. Incrementa a visualização na base de dados
         await supabase.rpc('increment_article_views', { article_slug: slug });
 
-        // 2. Vai buscar os dados do artigo (com a contagem já atualizada e dados da edição para a citação)
+        // 2. Busca os dados (REMOVIDA a relação conflituosa com 'editions')
         const { data, error: supabaseError } = await supabase
           .from('articles')
-          .select('*, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug), editions(number, publish_date)')
+          .select('*, users:author_id(name, biography), themes!articles_theme_id_fkey(name, slug)')
           .eq('slug', slug)
           .maybeSingle();
 
@@ -73,10 +73,8 @@ export default function ArticlePage() {
     );
   }
 
-  // Define o ano de publicação para a ferramenta de Citação (ABNT)
-  const publishYear = article.editions?.publish_date 
-    ? new Date(article.editions.publish_date).getFullYear() 
-    : new Date().getFullYear();
+  // Se a edição não for carregada, usa o ano atual por defeito para a citação
+  const publishYear = new Date().getFullYear();
 
   // Tratamento do conteúdo
   let contentElement;
