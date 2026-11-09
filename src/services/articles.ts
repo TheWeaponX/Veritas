@@ -5,7 +5,7 @@ import type { Article, ArticleStatus } from '../types/database.types';
 export async function listPublishedArticles(limit = 6) {
   const { data, error } = await supabase
     .from('articles')
-    .select('*, themes:theme_id(name, slug), users:author_id(name)')
+    .select('*, themes!articles_theme_id_fkey(name, slug), users:author_id(name)')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .limit(limit);
@@ -16,7 +16,7 @@ export async function listPublishedArticles(limit = 6) {
 export async function getArticleBySlug(slug: string) {
   const { data, error } = await supabase
     .from('articles')
-    .select('*, themes:theme_id(name, slug), users:author_id(name, biography, profile_image), references:references(*)')
+    .select('*, themes!articles_theme_id_fkey(name, slug), users:author_id(name, biography, profile_image), references(*)')
     .eq('slug', slug)
     .maybeSingle();
   if (error) throw error;
@@ -32,7 +32,7 @@ export async function getArticleById(id: string) {
 export async function listPublishedByAuthor(authorId: string) {
   const { data, error } = await supabase
     .from('articles')
-    .select('*, themes:theme_id(name, slug)')
+    .select('*, themes!articles_theme_id_fkey(name, slug)')
     .eq('author_id', authorId)
     .eq('status', 'published')
     .order('published_at', { ascending: false });
@@ -83,7 +83,7 @@ export async function submitForReview(articleId: string) {
 export async function listSubmittedArticles() {
   const { data, error } = await supabase
     .from('articles')
-    .select('*, users:author_id(name, email), themes:theme_id(name)')
+    .select('*, users:author_id(name, email), themes!articles_theme_id_fkey(name)')
     .eq('status', 'submitted')
     .order('updated_at', { ascending: true });
   if (error) throw error;
@@ -107,7 +107,7 @@ export async function requestChangesOnArticle(articleId: string) {
 export async function listRejectedArticles() {
   const { data, error } = await supabase
     .from('articles')
-    .select('*, users:author_id(name), themes:theme_id(name)')
+    .select('*, users:author_id(name), themes!articles_theme_id_fkey(name)')
     .eq('status', 'rejected')
     .order('updated_at', { ascending: false });
   if (error) throw error;
@@ -148,7 +148,7 @@ export async function searchArticles(query: string) {
 
   const { data, error } = await supabase
     .from('articles')
-    .select('*, themes:theme_id(name), users:author_id(name)')
+    .select('*, themes!articles_theme_id_fkey(name), users:author_id(name)')
     .eq('status', 'published')
     .or(orParts.join(','))
     .limit(20);
