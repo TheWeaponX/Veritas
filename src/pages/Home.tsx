@@ -40,7 +40,11 @@ export default function Home() {
   }, []);
 
   if (loading) {
-    return <div className="max-w-5xl mx-auto px-6 py-32 text-center text-sm text-ink-500 font-serif">A carregar o volume...</div>;
+    return (
+      <div className="max-w-5xl mx-auto px-6 py-32 text-center text-sm text-ink-500 font-serif">
+        A carregar o volume...
+      </div>
+    );
   }
 
   const publishYear = latestEdition?.publish_date 
@@ -64,14 +68,14 @@ export default function Home() {
           </p>
         </header>
 
-        {/* VITRINE DA EDIÇÃO ATUAL (ESTILO CAPA DE LIVRO ANTIGO / CLÁSSICO) */}
+        {/* VITRINE DA EDIÇÃO ATUAL (100% dinâmica pelo Supabase, sem card lateral fixo) */}
         {latestEdition ? (
-          <section className="bg-white border-2 border-ink-900/10 rounded-2xl p-8 sm:p-12 shadow-xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <section className="bg-white border-2 border-ink-900/10 rounded-2xl p-8 sm:p-12 shadow-xl relative overflow-hidden">
             
             {/* Detalhe estético lateral (lombada simulada) */}
             <div className="absolute top-0 left-0 w-3 h-full bg-brass-700 hidden lg:block" />
 
-            <div className="lg:col-span-8 space-y-6">
+            <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <span className="font-mono text-xs font-bold uppercase tracking-wider bg-ink-900 text-white px-3 py-1 rounded">
                   Edição #{latestEdition.number}
@@ -82,40 +86,26 @@ export default function Home() {
               </div>
 
               <h2 className="font-display text-3xl sm:text-4xl font-bold text-ink-900 leading-tight">
-                {latestEdition.title || 'Liber Primus'}
+                {latestEdition.title}
               </h2>
 
-              <div className="prose font-serif text-ink-700 leading-relaxed text-base sm:text-lg">
-                <p>
-                  {latestEdition.description || 
-                    "O Liber Primus é o marco inaugural da nossa jornada pelo conhecimento, concebido como a pedra angular da Scientia Periodica para propor um diálogo direto entre os fenómenos naturais, a vida e as criações humanas. Rompendo com as barreiras tradicionais do saber, este volume de estreia foca-se na intersecção de disciplinas que moldam a nova realidade."}
-                </p>
-              </div>
+              {latestEdition.description && (
+                <div className="prose font-serif text-ink-700 leading-relaxed text-base sm:text-lg">
+                  <p>{latestEdition.description}</p>
+                </div>
+              )}
 
-              <div className="pt-2 flex items-center gap-4">
-                <span className="text-xs font-mono uppercase tracking-widest text-ink-400">
+              <div className="pt-6 flex items-center justify-between flex-wrap gap-4 border-t border-ink-100 mt-6">
+                <span className="text-xs font-mono uppercase tracking-widest text-ink-500">
                   {articles.length} Artigos Publicados neste Volume
                 </span>
+                <Link 
+                  to="/edicoes" 
+                  className="bg-ink-900 text-white py-2 px-5 rounded text-xs font-mono uppercase tracking-wider hover:bg-ink-800 transition-colors shadow-sm"
+                >
+                  Explorar Edições Anteriores
+                </Link>
               </div>
-            </div>
-
-            {/* Coluna da Direita: Selo Editorial / Informação extra */}
-            <div className="lg:col-span-4 bg-ink-50 border border-ink-200/60 rounded-xl p-6 flex flex-col justify-between space-y-6 text-center">
-              <div>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-ink-400 mb-1">Volume Inaugural</p>
-                <p className="font-display text-2xl font-bold text-ink-900">Liber Primus</p>
-                <div className="w-12 h-0.5 bg-brass-600 mx-auto my-3" />
-                <p className="text-xs font-serif text-ink-600 italic">
-                  Curadoria dedicada à união entre exatas, naturais e ciências humanas.
-                </p>
-              </div>
-
-              <Link 
-                to="/editions" 
-                className="inline-block w-full bg-ink-900 text-white py-2.5 px-4 rounded text-xs font-mono uppercase tracking-wider hover:bg-ink-800 transition-colors shadow-sm"
-              >
-                Explorar Edições Anteriores
-              </Link>
             </div>
 
           </section>
